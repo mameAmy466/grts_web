@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { IconArrowRight, IconClock, IconPlay } from "@/components/icons";
 import { MediaImage } from "@/components/media-image";
@@ -8,7 +9,7 @@ export function PlayBadge({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        "flex h-10 w-10 items-center justify-center rounded-full bg-brand text-white shadow-lg",
+        "btn-glass-dark flex h-10 w-10 items-center justify-center rounded-full text-white",
         className,
       )}
     >
@@ -38,38 +39,84 @@ export function VideoCard({
   className?: string;
 }) {
   return (
-    <Link href={video.href} className={cn("group block", className)}>
-      <div className="relative aspect-video overflow-hidden rounded-lg bg-zinc-800">
+    <Link
+      href={video.href}
+      className={cn(
+        "group flex h-[233px] w-full max-w-[267px] flex-col gap-2.5 overflow-hidden rounded-lg",
+        className,
+      )}
+    >
+      <div className="relative h-[150px] w-full shrink-0 overflow-hidden rounded-lg bg-zinc-800">
         <MediaImage
           src={video.image}
           alt={video.title}
+          sizes="267px"
         />
+        <PlayBadge className="absolute bottom-2 left-2 h-8 w-8" />
         <Duration value={video.duration} />
       </div>
-      <h3 className="mt-2.5 text-sm font-semibold leading-snug text-white group-hover:text-brand">
-        {video.title}
-      </h3>
-      <p className="mt-1 text-xs text-zinc-400">{formatDisplayDate(video.posted)}</p>
+      <div className="min-w-0 px-0.5">
+        <h3 className="line-clamp-2 text-sm font-bold leading-snug text-white group-hover:text-brand">
+          {video.title}
+        </h3>
+        <p className="mt-1 text-xs text-zinc-500">{formatDisplayDate(video.posted)}</p>
+      </div>
     </Link>
   );
 }
 
-export function ShortCard({ item }: { item: ShortItem }) {
-  return (
-    <Link href={item.href} className="group relative block overflow-hidden rounded-xl">
-      <div className="relative aspect-[9/16] bg-zinc-800">
-        <MediaImage
-          src={item.image}
-          alt={item.title}
-          sizes="168px"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
-        <Duration value={item.duration} className="top-2 right-2 bottom-auto" />
-        <div className="absolute inset-x-0 bottom-0 p-3">
-          <p className="line-clamp-3 break-words text-sm font-semibold leading-snug text-white">{item.title}</p>
-          <p className="mt-1 text-[11px] uppercase tracking-wide text-zinc-300">{item.category}</p>
-        </div>
+export function ShortCard({
+  item,
+  selected,
+  onSelect,
+  className,
+}: {
+  item: ShortItem;
+  selected?: boolean;
+  onSelect?: () => void;
+  className?: string;
+}) {
+  const cardClassName = cn(
+    "group relative block h-[350px] w-[220px] overflow-hidden rounded-lg border bg-zinc-800 text-left",
+    selected ? "border-brand" : "border-[var(--color-bg-primary,#0A0A0A)]",
+    className,
+  );
+  const content = (
+    <>
+      <Image
+        src={item.image || "/logo.png"}
+        alt={item.title}
+        width={220}
+        height={350}
+        sizes="220px"
+        className="absolute inset-0 h-full w-full max-w-none object-cover object-center"
+      />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(179.84deg, rgba(0, 0, 0, 0) 0.14%, rgba(0, 0, 0, 0.9) 86.02%)",
+        }}
+      />
+      <Duration value={item.duration} className="top-2 right-2 bottom-auto" />
+      <div className="absolute inset-x-0 bottom-0 pb-3 pl-5 pr-3">
+        <p className="line-clamp-3 break-words text-sm font-semibold leading-snug text-white">{item.title}</p>
+        <p className="mt-1 text-[11px] uppercase tracking-wide text-zinc-300">{item.category}</p>
       </div>
+    </>
+  );
+
+  if (onSelect) {
+    return (
+      <button type="button" onClick={onSelect} className={cardClassName}>
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <Link href={item.href} className={cardClassName}>
+      {content}
     </Link>
   );
 }

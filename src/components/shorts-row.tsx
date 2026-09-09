@@ -47,8 +47,8 @@ export function ShortsRow({ items }: { items: ShortItem[] }) {
         className="shorts-scroller flex snap-x snap-mandatory gap-3 overflow-x-auto"
       >
         {items.map((item) => (
-          <div key={item.id} className="w-[168px] shrink-0 snap-start">
-            <ShortCard item={item} />
+          <div key={item.id} className="h-[350px] w-[220px] shrink-0 snap-start">
+            <ShortCard item={item} className="h-full w-full" />
           </div>
         ))}
       </div>

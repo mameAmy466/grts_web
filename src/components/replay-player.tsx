@@ -76,7 +76,7 @@ export function ReplayPlayer({ episode }: { episode: ReplayEpisode }) {
               onClick={() => setPlaying((value) => !value)}
               className="absolute inset-0 flex items-center justify-center"
             >
-              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand text-white shadow-lg">
+              <span className="btn-glass-dark flex h-16 w-16 items-center justify-center rounded-full text-white">
                 <IconPlay className="ml-1 h-7 w-7" />
               </span>
             </button>

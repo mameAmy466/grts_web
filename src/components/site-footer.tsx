@@ -26,10 +26,12 @@ export function SiteFooter({ theme }: { theme: ChromeTheme }) {
     <footer
       className={cn(
         "mt-auto border-t",
-        dark ? "border-white/10 bg-[#111] text-zinc-300" : "border-zinc-200 bg-zinc-100 text-zinc-600",
+        dark
+          ? "border-[var(--color-bg-primary,#0A0A0A)] bg-[var(--color-bg-secondary,#171717)] text-zinc-300"
+          : "border-zinc-200 bg-zinc-100 text-zinc-600",
       )}
     >
-      <div className="mx-auto grid max-w-[1240px] gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto grid w-full max-w-[1514px] gap-10 px-6 py-14 sm:px-8 md:grid-cols-2 lg:grid-cols-4 xl:px-32">
         <div>
           <Logo className={dark ? "text-white" : "text-zinc-900"} />
           <p className="mt-4 max-w-xs text-sm leading-6">{SITE.tagline}</p>
@@ -96,10 +98,10 @@ export function SiteFooter({ theme }: { theme: ChromeTheme }) {
       <div
         className={cn(
           "border-t",
-          dark ? "border-white/10 text-zinc-500" : "border-zinc-200 text-zinc-500",
+          dark ? "border-[var(--color-bg-primary,#0A0A0A)] text-zinc-500" : "border-zinc-200 text-zinc-500",
         )}
       >
-        <div className="mx-auto flex max-w-[1240px] flex-col gap-2 px-4 py-4 text-xs sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="mx-auto flex w-full max-w-[1514px] flex-col gap-2 px-6 py-4 text-xs sm:flex-row sm:items-center sm:justify-between sm:px-8 xl:px-32">
           <p>© 2026 GRTS Gambia. All rights reserved.</p>
           <p>A service of the Government of The Gambia</p>
         </div>

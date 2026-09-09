@@ -69,7 +69,7 @@ export function SiteHeader({
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--color-bg-primary,#0A0A0A)] bg-[#171717] text-white">
       <div className="hidden border-b border-[var(--color-bg-primary,#0A0A0A)] bg-[var(--color-bg-primary,#0A0A0A)] text-[12px] text-zinc-400 sm:block">
-        <div className="mx-auto flex h-12 w-full max-w-[1514px] items-center justify-between px-4 sm:px-6 xl:px-20">
+        <div className="mx-auto flex h-12 w-full max-w-[1514px] items-center justify-between px-6 sm:px-8 xl:px-32">
           <div className="flex items-center gap-4">
             <a href={`tel:${SITE.phone.replace(/\s/g, "")}`} className="inline-flex items-center gap-1.5 hover:text-brand">
               <IconPhone className="h-3.5 w-3.5" />
@@ -103,7 +103,7 @@ export function SiteHeader({
         </div>
       </div>
 
-      <div className="mx-auto flex h-[68px] w-full max-w-[1514px] items-center px-4 sm:px-6 xl:px-20">
+      <div className="mx-auto flex h-[68px] w-full max-w-[1514px] items-center px-6 sm:px-8 xl:px-32">
         <Logo className="text-white" />
 
         <nav className="hidden items-center gap-7 text-[15px] font-medium lg:ml-16 lg:flex xl:ml-[265px]">

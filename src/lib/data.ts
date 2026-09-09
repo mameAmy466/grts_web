@@ -278,7 +278,7 @@ export const watchAgainFeatured: VideoItem = {
   href: "/programmes/grts-news-hour/watch",
 };
 
-export const watchAgainSide: VideoItem[] = latestVideos.slice(1, 5);
+export const watchAgainSide: VideoItem[] = latestVideos.slice(1, 4);
 
 export const popularVideos: VideoItem[] = [
   latestVideos[4],

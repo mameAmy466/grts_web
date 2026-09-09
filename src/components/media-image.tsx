@@ -34,7 +34,7 @@ export function SiteWrap({
   className?: string;
 }) {
   return (
-    <div className={cn("mx-auto w-full max-w-[1240px] px-4 sm:px-6", className)}>
+    <div className={cn("mx-auto w-full max-w-[1514px] px-6 sm:px-8 xl:px-32", className)}>
       {children}
     </div>
   );

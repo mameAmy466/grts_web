@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ShortCard } from "@/components/cards";
 import { IconChevronLeft, IconChevronRight, IconVolume, IconVolumeOff } from "@/components/icons";
 import { MediaImage } from "@/components/media-image";
 import type { ShortItem } from "@/lib/types";
@@ -215,31 +216,15 @@ export function ShortsPlayer({
 
       <aside className="hidden lg:col-span-7 lg:block">
         <h2 className="mb-4 text-lg font-bold text-white">Les shorts</h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {shorts.map((item, index) => {
-            const selected = index === active;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => scrollTo(index)}
-                className={cn(
-                  "group overflow-hidden rounded-xl border bg-[#141414] text-left",
-                  selected ? "border-brand" : "border-white/10 hover:border-white/25",
-                )}
-              >
-                <div className="relative aspect-[9/16]">
-                  <MediaImage src={item.image} alt={item.title} sizes="180px" />
-                  <span className="absolute bottom-2 right-2 rounded bg-black/75 px-1.5 py-0.5 text-[10px] text-white">
-                    {item.duration}
-                  </span>
-                </div>
-                <p className="line-clamp-2 p-2 text-xs font-semibold leading-snug text-white group-hover:text-brand">
-                  {item.title}
-                </p>
-              </button>
-            );
-          })}
+        <div className="grid grid-cols-3 justify-items-start gap-2">
+          {shorts.map((item, index) => (
+            <ShortCard
+              key={item.id}
+              item={item}
+              selected={index === active}
+              onSelect={() => scrollTo(index)}
+            />
+          ))}
         </div>
       </aside>
     </div>

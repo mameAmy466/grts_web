@@ -105,7 +105,7 @@ export function LiveVideoPlayer({
             type="button"
             aria-label={playing ? "Pause" : "Play"}
             onClick={() => void togglePlay()}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10"
+            className="btn-glass-dark flex h-9 w-9 items-center justify-center rounded-full"
           >
             {playing ? <IconPause className="h-4 w-4" /> : <IconPlay className="h-4 w-4" />}
           </button>
@@ -176,7 +176,7 @@ export function LiveRadioCard() {
         type="button"
         aria-label={playing ? "Pause radio" : "Play radio"}
         onClick={() => setPlaying((value) => !value)}
-        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand text-white"
+        className="btn-glass-dark flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-white"
       >
         {playing ? <IconPause className="h-5 w-5" /> : <IconPlay className="ml-0.5 h-5 w-5" />}
       </button>
@@ -189,12 +189,12 @@ export function StickyRadioBar() {
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[#111]/95 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-[1240px] items-center gap-3 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 w-full max-w-[1514px] items-center gap-3 px-6 sm:px-8 xl:px-32">
         <button
           type="button"
           aria-label={playing ? "Pause" : "Play"}
           onClick={() => setPlaying((value) => !value)}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-white"
+          className="btn-glass-dark flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white"
         >
           {playing ? <IconPause className="h-4 w-4" /> : <IconPlay className="ml-0.5 h-4 w-4" />}
         </button>
@@ -246,7 +246,7 @@ export function FmNowPlaying({
             sizes="72px"
           />
           <span className="absolute inset-0 flex items-center justify-center bg-black/25">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-white">
+            <span className="btn-glass-dark flex h-8 w-8 items-center justify-center rounded-full text-white">
               <IconPlay className="ml-0.5 h-3.5 w-3.5" />
             </span>
           </span>
@@ -318,7 +318,7 @@ export function FmPlayerBar({
             type="button"
             aria-label={playing ? "Pause" : "Play"}
             onClick={() => void toggle()}
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand text-white"
+            className="btn-glass-dark flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white"
           >
             {playing ? <IconPause className="h-5 w-5" /> : <IconPlay className="ml-0.5 h-5 w-5" />}
           </button>
