@@ -17,7 +17,7 @@ import {
 } from "@/lib/data";
 import { getWpPosts } from "@/lib/api/wordpress";
 import type { Article } from "@/lib/types";
-import { formatDisplayDate, unsplash } from "@/lib/utils";
+import { clipText, formatDisplayDate, unsplash } from "@/lib/utils";
 
 export function generateStaticParams() {
   return allArticles().map((article) => ({
@@ -82,7 +82,12 @@ export default async function NewsArticlePage({
   if (!article) notFound();
 
   const body = articleBody(article);
-  const related = relatedArticles(article);
+  const others = (await getWpPosts({ perPage: 12 })).filter((item) => item.id !== article.id);
+  const sameCategory = others.filter((item) => item.category === article.category);
+  const related = (sameCategory.length ? sameCategory : others.length ? others : relatedArticles(article)).slice(
+    0,
+    3,
+  );
   const crumb = article.title.length > 42 ? `${article.title.slice(0, 42)}…` : article.title;
 
   const share = [
@@ -110,15 +115,15 @@ export default async function NewsArticlePage({
         </SiteWrap>
       </div>
 
-      <SiteWrap className="grid gap-10 py-10 lg:grid-cols-12">
-        <article className="lg:col-span-8">
+      <SiteWrap className="grid items-start gap-8 py-8 lg:grid-cols-12">
+        <article className="min-w-0 lg:col-span-8">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
             {article.categoryLabel}
           </p>
-          <h1 className="mt-3 text-3xl font-bold leading-tight text-zinc-900 md:text-4xl">
+          <h1 className="mt-2 text-3xl font-bold leading-tight text-zinc-900 md:text-4xl">
             {article.title}
           </h1>
-          <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-zinc-500">
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-zinc-500">
             <span className="relative h-10 w-10 overflow-hidden rounded-full bg-zinc-200">
               <MediaImage src={body.authorImage} alt={body.author} sizes="40px" />
             </span>
@@ -135,8 +140,8 @@ export default async function NewsArticlePage({
             ) : null}
           </div>
 
-          <figure className="mt-7">
-            <div className="relative aspect-[16/8] overflow-hidden rounded-xl bg-zinc-200">
+          <figure className="mt-5">
+            <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-zinc-200">
               <MediaImage
                 src={article.image}
                 alt={article.title}
@@ -149,16 +154,16 @@ export default async function NewsArticlePage({
             </figcaption>
           </figure>
 
-          <div className="mt-8 space-y-6 text-[17px] leading-8 text-zinc-700">
+          <div className="mt-6 text-[17px] leading-8 text-zinc-700">
             {article.contentHtml ? (
               <div className="wp-content" dangerouslySetInnerHTML={{ __html: article.contentHtml }} />
             ) : (
-              <>
+              <div className="space-y-5">
                 <p className="font-semibold text-zinc-900">{body.lead}</p>
                 {body.sections.map((section) => (
                   <section key={section.heading ?? section.paragraphs[0]}>
                     {section.heading ? (
-                      <h2 className="mb-3 text-xl font-bold text-zinc-900">{section.heading}</h2>
+                      <h2 className="mb-2 text-xl font-bold text-zinc-900">{section.heading}</h2>
                     ) : null}
                     {section.paragraphs.map((paragraph) => (
                       <p key={paragraph} className="mt-3 first:mt-0">
@@ -167,23 +172,25 @@ export default async function NewsArticlePage({
                     ))}
                   </section>
                 ))}
-              </>
+              </div>
             )}
           </div>
 
-          <div className="mt-10 flex flex-wrap gap-2">
-            {body.tags.map((tag) => (
-              <Link
-                key={tag}
-                href={`/news/${article.category}`}
-                className="rounded-full bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-200"
-              >
-                {tag}
-              </Link>
-            ))}
-          </div>
+          {body.tags.length ? (
+            <div className="mt-6 flex flex-wrap justify-start gap-2">
+              {body.tags.map((tag) => (
+                <Link
+                  key={tag}
+                  href={`/news/${article.category}`}
+                  className="rounded-full bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-200"
+                >
+                  {tag}
+                </Link>
+              ))}
+            </div>
+          ) : null}
 
-          <div className="mt-8 border-t border-zinc-200 pt-6">
+          <div className="mt-6 border-t border-zinc-200 pt-5">
             <p className="text-sm font-semibold text-zinc-800">Share this article:</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {share.map(({ name, href, Icon }) => (
@@ -192,7 +199,7 @@ export default async function NewsArticlePage({
                   href={href}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium text-zinc-700 hover:border-brand hover:text-brand"
+                  className="btn-glass inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-zinc-700 hover:text-brand"
                 >
                   <Icon className="h-4 w-4" />
                   {name}
@@ -200,31 +207,33 @@ export default async function NewsArticlePage({
               ))}
             </div>
           </div>
+
+          {related.length ? (
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold text-zinc-900">Related Articles</h2>
+              <div className="mt-4 grid gap-5 sm:grid-cols-3">
+                {related.map((item) => (
+                  <Link key={item.id} href={item.href} className="group block">
+                    <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-zinc-200">
+                      <MediaImage
+                        src={item.image}
+                        alt={item.title}
+                      />
+                    </div>
+                    <p className="mt-2 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+                      {item.categoryLabel} • {formatDisplayDate(item.date)}
+                    </p>
+                    <h3 className="mt-1 line-clamp-3 break-words text-sm font-bold leading-snug text-zinc-900 group-hover:text-brand">
+                      {clipText(item.title, 90)}
+                    </h3>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </article>
 
         <NewsSidebar activeCategory={article.category} />
-      </SiteWrap>
-
-      <SiteWrap>
-        <h2 className="text-2xl font-bold text-zinc-900">Related Articles</h2>
-        <div className="mt-6 grid gap-6 md:grid-cols-3">
-          {related.map((item) => (
-            <Link key={item.id} href={item.href} className="group block">
-              <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-zinc-200">
-                <MediaImage
-                  src={item.image}
-                  alt={item.title}
-                />
-              </div>
-              <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
-                {item.categoryLabel} • {formatDisplayDate(item.date)}
-              </p>
-              <h3 className="mt-1.5 text-base font-bold leading-snug text-zinc-900 group-hover:text-brand">
-                {item.title}
-              </h3>
-            </Link>
-          ))}
-        </div>
       </SiteWrap>
     </div>
   );

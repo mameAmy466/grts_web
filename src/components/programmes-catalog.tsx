@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { IconSearch } from "@/components/icons";
+import { useMemo, useRef, useState } from "react";
+import { IconChevronLeft, IconChevronRight, IconSearch } from "@/components/icons";
 import { ProgramCard } from "@/components/program-card";
 import { SiteWrap } from "@/components/media-image";
 import type { CatalogFilter, Program } from "@/lib/types";
@@ -28,6 +28,13 @@ export function ProgrammesCatalog({
 
   const [filter, setFilter] = useState("all");
   const [query, setQuery] = useState("");
+  const scrollerRef = useRef<HTMLDivElement>(null);
+
+  function slide(direction: -1 | 1) {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    scroller.scrollBy({ left: direction * Math.max(220, scroller.clientWidth * 0.7), behavior: "smooth" });
+  }
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -52,22 +59,46 @@ export function ProgrammesCatalog({
     <div className="pb-20 pt-8">
       <SiteWrap>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap gap-2">
-            {chips.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setFilter(item.id)}
-                className={cn(
-                  "rounded-full px-3.5 py-1.5 text-sm font-medium",
-                  filter === item.id
-                    ? "bg-brand text-white"
-                    : "border border-white/20 text-zinc-200 hover:border-white/40 hover:text-white",
-                )}
-              >
-                {item.label}
-              </button>
-            ))}
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <button
+              type="button"
+              aria-label="Catégories précédentes"
+              onClick={() => slide(-1)}
+              className="btn-glass-dark hidden h-9 w-9 shrink-0 items-center justify-center rounded-full text-white sm:flex"
+            >
+              <IconChevronLeft className="h-4 w-4" />
+            </button>
+            <div
+              ref={scrollerRef}
+              className="-mx-1 flex min-w-0 flex-1 snap-x snap-mandatory gap-2 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              {chips.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={(event) => {
+                    setFilter(item.id);
+                    event.currentTarget.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+                  }}
+                  className={cn(
+                    "shrink-0 snap-start rounded-full px-3.5 py-1.5 text-sm font-medium whitespace-nowrap",
+                    filter === item.id
+                      ? "bg-brand text-white"
+                      : "btn-glass-dark text-zinc-200 hover:text-white",
+                  )}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              aria-label="Catégories suivantes"
+              onClick={() => slide(1)}
+              className="btn-glass-dark hidden h-9 w-9 shrink-0 items-center justify-center rounded-full text-white sm:flex"
+            >
+              <IconChevronRight className="h-4 w-4" />
+            </button>
           </div>
           <label className="relative block w-full lg:max-w-xs">
             <span className="sr-only">Search a programme</span>

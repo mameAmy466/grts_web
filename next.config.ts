@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ["undici"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
@@ -9,6 +10,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "i.ytimg.com" },
       { protocol: "https", hostname: "img.youtube.com" },
       { protocol: "https", hostname: "nannews.ng" },
+      { protocol: "https", hostname: "actunet.net" },
       { protocol: "https", hostname: "secure.gravatar.com" },
       { protocol: "https", hostname: "i0.wp.com" },
       { protocol: "https", hostname: "i1.wp.com" },

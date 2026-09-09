@@ -151,6 +151,15 @@ export const homeHeadlines = {
       date: "July 30, 2026 10:05",
       image: unsplash("photo-1551836022-d5d88e9218df", 400),
     }),
+    article({
+      id: "hs4",
+      title: "Schools reopen with new digital attendance pilots in the Kanifing area",
+      excerpt: "",
+      category: "education",
+      categoryLabel: "Education",
+      date: "July 30, 2026 09:20",
+      image: unsplash("photo-1503676260728-1c00da094a0b", 400),
+    }),
   ],
 };
 
@@ -269,7 +278,7 @@ export const watchAgainFeatured: VideoItem = {
   href: "/programmes/grts-news-hour/watch",
 };
 
-export const watchAgainSide: VideoItem[] = latestVideos.slice(1, 4);
+export const watchAgainSide: VideoItem[] = latestVideos.slice(1, 5);
 
 export const popularVideos: VideoItem[] = [
   latestVideos[4],
@@ -441,6 +450,16 @@ export const latestNewsList: Article[] = [
     categoryLabel: "TECH",
     date: "July 31, 2026",
     image: unsplash("photo-1516321318423-f06f85e504f3", 300),
+  }),
+  article({
+    id: "ln4",
+    title: "Banjul port night shift expands to cut cargo waiting times",
+    excerpt:
+      "Operators say extra hours will ease congestion for perishable goods heading inland.",
+    category: "economy",
+    categoryLabel: "ECONOMY",
+    date: "July 30, 2026",
+    image: unsplash("photo-1578575437130-527eed3abbec", 300),
   }),
 ];
 
@@ -1155,10 +1174,10 @@ export const episodes: Episode[] = [
 ];
 
 export const followerStats = [
-  { name: "Facebook", count: "125K Fans", color: "#1877F2" },
-  { name: "X", count: "86K Followers", color: "#0F1419" },
-  { name: "YouTube", count: "210K Subs", color: "#FF0000" },
-  { name: "Instagram", count: "154K Followers", color: "#E1306C" },
+  { name: "Facebook", count: "125K", label: "Fans", color: "#1877F2" },
+  { name: "X", count: "89K", label: "Followers", color: "#1D9BF0" },
+  { name: "YouTube", count: "54K", label: "Subscribers", color: "#FF0000" },
+  { name: "Instagram", count: "45K", label: "Followers", color: "#E1306C" },
 ] as const;
 
 export function getCategory(slug: string) {
@@ -1166,7 +1185,7 @@ export function getCategory(slug: string) {
 }
 
 export function articlesFor(slug: CategorySlug) {
-  return categoryArticles[slug];
+  return categoryArticles[slug] ?? [];
 }
 
 export function allArticles() {

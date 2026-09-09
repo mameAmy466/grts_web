@@ -52,21 +52,20 @@ function GuideRow({ slot }: { slot: ProgramSlot }) {
   return (
     <li
       className={cn(
-        "relative rounded-lg border px-3 py-2.5",
-        slot.live ? "border-brand bg-brand/10" : "border-white/5 bg-white/5",
+        "relative flex items-start gap-3 rounded-lg border px-3 py-2.5",
+        slot.live ? "border-brand bg-transparent" : "border-transparent",
       )}
     >
       {slot.live ? (
-        <span className="absolute right-2 top-2 rounded bg-brand px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+        <span className="absolute -top-2 right-3 rounded bg-brand px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
           Now live
         </span>
       ) : null}
-      <p className="text-xs font-semibold text-zinc-400">{slot.time}</p>
-      <p className="mt-0.5 text-sm font-semibold text-white">
-        {slot.live ? <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-brand" /> : null}
-        {slot.title}
-      </p>
-      {slot.category ? <p className="text-[11px] text-zinc-500">{slot.category}</p> : null}
+      <p className="w-12 shrink-0 text-sm font-bold text-white">{slot.time}</p>
+      <div className="min-w-0">
+        <p className="text-sm font-semibold text-white">{slot.title}</p>
+        {slot.category ? <p className="mt-0.5 text-[11px] text-zinc-500">{slot.category}</p> : null}
+      </div>
     </li>
   );
 }

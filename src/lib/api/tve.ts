@@ -1,6 +1,6 @@
 import { allItems, getJson } from "@/lib/api/http";
 import { TVE_API_BASE, TVE_APP_DETAILS_URL, TVE_APP_SLUG } from "@/lib/env";
-import type { CatalogFilter, Program, ProgramSlot, ReplayEpisode, VideoItem } from "@/lib/types";
+import type { CatalogFilter, Program, ProgramSlot, ReplayEpisode, ShortItem, VideoItem } from "@/lib/types";
 import { colorFromLabel, durationToSeconds, formatDisplayDate, slugify } from "@/lib/utils";
 
 type TveAppDetails = {
@@ -83,6 +83,15 @@ type TveVideo = {
   webdetail_url?: string;
   video_url?: string;
   type?: string;
+  chaine_name?: string;
+};
+
+type TvePlaylist = {
+  details?: {
+    subitems?: {
+      data?: TveVideo[];
+    };
+  };
 };
 
 type TveGuideSlot = {
@@ -273,6 +282,96 @@ export async function getTveSliders(): Promise<VideoItem[]> {
   }
 }
 
+async function getAlauneEpisodes(): Promise<ReplayEpisode[]> {
+  const menu = await getAndroidItem("CHAINE A la UNE");
+  if (!menu?.feed_url) return [];
+  const groups = allItems<{ list_alaune_by_group?: string }>(await getJson(menu.feed_url));
+  const url = groups[0]?.list_alaune_by_group;
+  if (!url) return [];
+  return allItems<TveVideo>(await getJson(url)).map(replayTvToEpisode);
+}
+
+async function getCategoryReplayEpisodes(limit: number, seen: Set<string>): Promise<ReplayEpisode[]> {
+  const categories = await getVodCategories();
+  const collected: ReplayEpisode[] = [];
+  for (const category of categories.slice(0, 4)) {
+    if (!category.video_feed_url || collected.length >= limit) break;
+    try {
+      const videos = allItems<TveVideo>(await getJson(category.video_feed_url));
+      for (const video of videos) {
+        const episode = replayTvToEpisode(video);
+        if (seen.has(episode.id)) continue;
+        seen.add(episode.id);
+        collected.push(episode);
+        if (collected.length >= limit) break;
+      }
+    } catch {
+      continue;
+    }
+  }
+  return collected;
+}
+
+export async function getTveReplayEpisodes(): Promise<ReplayEpisode[]> {
+  try {
+    const featured = await getAlauneEpisodes();
+    const seen = new Set(featured.map((item) => item.id));
+    const extra = featured.length < 12 ? await getCategoryReplayEpisodes(12 - featured.length, seen) : [];
+    return [...featured, ...extra];
+  } catch {
+    return [];
+  }
+}
+
+export async function getTveReplayVideos(limit = 12): Promise<VideoItem[]> {
+  return (await getTveReplayEpisodes()).slice(0, limit).map(replayToVideo);
+}
+
+function playlistItems(payload: TvePlaylist) {
+  return payload.details?.subitems?.data ?? [];
+}
+
+function shortToItem(item: TveVideo): ShortItem {
+  const slug = item.slug || slugify(item.title);
+  return {
+    id: slug,
+    title: item.title,
+    category: item.chaine_name || "Shorts",
+    image: item.logo_url || item.logo || "",
+    duration: (item.time || "00:00").replace(/^0?0:/, "0:"),
+    href: `/shorts/${slug}`,
+    videoUrl: item.video_url,
+  };
+}
+
+export async function getTveShorts(limit = 10): Promise<ShortItem[]> {
+  try {
+    const data = await getJson<TvePlaylist>(
+      tveUrl("details", "playlist", "short-videos", TVE_APP_SLUG),
+    );
+    return playlistItems(data).slice(0, limit).map(shortToItem);
+  } catch {
+    return [];
+  }
+}
+
+export async function getTveShort(slug: string) {
+  const shorts = await getTveShorts(50);
+  return shorts.find((item) => item.id === slug) ?? null;
+}
+
+export async function getTveShortVideoUrl(slug: string) {
+  try {
+    const data = await getJson<TvePlaylist>(
+      tveUrl("details", "playlist", "short-videos", TVE_APP_SLUG),
+    );
+    const item = playlistItems(data).find((video) => (video.slug || slugify(video.title)) === slug);
+    return item?.video_url || "";
+  } catch {
+    return "";
+  }
+}
+
 export async function getTveGuideSlots(): Promise<ProgramSlot[]> {
   try {
     const guide = await getJson<TveGuideChannel[]>(appJson("guidetvall", "today"));
@@ -323,6 +422,23 @@ function videoToReplay(item: TveVideo, programSlug: string): ReplayEpisode {
     about: item.desc || item.title,
     streamFeedUrl: item.feed_url || item.webdetail_url,
     streamUrl: item.video_url,
+  };
+}
+
+function replayTvToEpisode(item: TveVideo): ReplayEpisode {
+  const episode = videoToReplay(item, "replay");
+  return { ...episode, href: `/replay/${episode.id}` };
+}
+
+function replayToVideo(episode: ReplayEpisode): VideoItem {
+  return {
+    id: episode.id,
+    title: episode.title,
+    image: episode.image,
+    posted: episode.posted,
+    duration: episode.duration,
+    href: episode.href || `/replay/${episode.id}`,
+    streamFeedUrl: episode.streamFeedUrl,
   };
 }
 

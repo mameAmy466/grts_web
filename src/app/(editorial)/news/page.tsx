@@ -14,7 +14,7 @@ import {
   socialLinks,
 } from "@/lib/data";
 import { getWpPosts } from "@/lib/api/wordpress";
-import { formatDisplayDate } from "@/lib/utils";
+import { clipText, formatDisplayDate } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "News",
@@ -28,12 +28,12 @@ export default async function NewsPage() {
   const compact = posts.slice(1, 4).length ? posts.slice(1, 4) : newsHero.compact;
   const grid = posts.slice(4, 8).length ? posts.slice(4, 8) : newsHero.grid;
   const latestFeatured = posts[1] ?? latestNewsFeatured;
-  const latestList = posts.slice(2, 5).length ? posts.slice(2, 5) : latestNewsList;
+  const latestList = posts.slice(2, 6).length >= 4 ? posts.slice(2, 6) : latestNewsList;
   const viewed = posts.slice(5, 9).length ? posts.slice(5, 9) : mostViewed;
   const choice = posts.slice(8, 11).length ? posts.slice(8, 11) : editorsChoice;
 
   return (
-    <div className="pb-16">
+    <div className="bg-white pb-16">
       <BreakingTicker articles={posts.slice(0, 6)} />
 
       <SiteWrap className="py-10">
@@ -48,10 +48,12 @@ export default async function NewsPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
-                  <h1 className="text-2xl font-bold leading-tight text-white md:text-4xl">
-                    {featured.title}
+                  <h1 className="line-clamp-3 break-words text-2xl font-bold leading-tight text-white md:text-4xl">
+                    {clipText(featured.title, 110)}
                   </h1>
-                  <p className="mt-2 text-sm text-zinc-200">{featured.excerpt}</p>
+                  <p className="mt-2 line-clamp-3 break-words text-sm text-zinc-200">
+                    {clipText(featured.excerpt, 140)}
+                  </p>
                 </div>
               </div>
             </Link>
@@ -61,10 +63,10 @@ export default async function NewsPage() {
                   <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-zinc-200">
                     <MediaImage src={article.image} alt={article.title} sizes="56px" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-[11px] font-semibold uppercase text-brand">{article.categoryLabel}</p>
-                    <h3 className="text-sm font-semibold leading-snug text-zinc-900 group-hover:text-brand">
-                      {article.title}
+                    <h3 className="line-clamp-3 break-words text-sm font-semibold leading-snug text-zinc-900 group-hover:text-brand">
+                      {clipText(article.title, 72)}
                     </h3>
                     <p className="mt-1 text-xs text-zinc-500">{formatDisplayDate(article.date)}</p>
                   </div>
@@ -80,92 +82,113 @@ export default async function NewsPage() {
         </div>
       </SiteWrap>
 
-      <SiteWrap className="pb-14">
-        <h2 className="mb-6 text-2xl font-bold text-zinc-900">Latest News</h2>
-        <div className="grid gap-8 lg:grid-cols-12">
-          <article className="lg:col-span-4">
-            <Link href={latestFeatured.href} className="group block">
-              <div className="relative aspect-square overflow-hidden rounded-xl bg-zinc-200">
-                <MediaImage
-                  src={latestFeatured.image}
-                  alt={latestFeatured.title}
-                />
-              </div>
-              <p className="mt-4 text-[11px] font-semibold uppercase tracking-wide text-brand">
-                {latestFeatured.categoryLabel} · {formatDisplayDate(latestFeatured.date)}
-              </p>
-              <h3 className="mt-2 text-xl font-bold leading-snug text-zinc-900 group-hover:text-brand">
-                {latestFeatured.title}
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-zinc-600">{latestFeatured.excerpt}</p>
-            </Link>
-          </article>
-          <div className="flex flex-col justify-between gap-6 lg:col-span-5">
-            {latestList.map((article) => (
-              <Link key={article.id} href={article.href} className="group flex gap-4">
-                <div className="relative h-24 w-28 shrink-0 overflow-hidden rounded-lg bg-zinc-200">
-                  <MediaImage src={article.image} alt={article.title} sizes="120px" />
-                </div>
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-brand">
-                    {article.categoryLabel}
-                  </p>
-                  <h3 className="mt-1 text-sm font-bold leading-snug text-zinc-900 group-hover:text-brand">
-                    {article.title}
-                  </h3>
-                  <p className="mt-1 line-clamp-2 text-xs leading-5 text-zinc-500">{article.excerpt}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-          <aside className="lg:col-span-3">
-            <h3 className="text-sm font-bold text-zinc-900">Follow Us</h3>
-            <div className="mt-3 space-y-2">
-              {followerStats.map((item, index) => {
-                const Icon = socialIcons[item.name];
-                return (
-                  <a
-                    key={item.name}
-                    href={socialLinks[index].href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-3 rounded-md px-3 py-2.5 text-white"
-                    style={{ backgroundColor: item.color }}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span className="text-sm font-semibold">{item.count}</span>
-                  </a>
-                );
-              })}
-            </div>
-            <h3 className="mt-8 text-sm font-bold text-zinc-900">Most Viewed</h3>
-            <ol className="mt-3 space-y-4">
-              {viewed.map((article, index) => (
-                <li key={article.id} className="flex gap-3">
-                  <span className="text-2xl font-bold text-zinc-300">{index + 1}</span>
-                  <Link href={article.href} className="group">
-                    <p className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
-                      {article.categoryLabel}
+      <section className="bg-[#F5F5F5] py-6">
+      <SiteWrap>
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+          <div className="min-w-0 w-full flex-1">
+            <h2 className="mb-6 text-2xl font-bold text-zinc-900">Latest News</h2>
+            <div className="flex flex-col gap-3 md:flex-row md:items-stretch">
+              <article className="min-w-0 flex-1">
+                <Link href={latestFeatured.href} className="group flex h-full flex-col overflow-hidden rounded-xl bg-white">
+                  <div className="relative aspect-[16/10] bg-zinc-200">
+                    <MediaImage
+                      src={latestFeatured.image}
+                      alt={latestFeatured.title}
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col p-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-brand">
+                      {latestFeatured.categoryLabel} · {formatDisplayDate(latestFeatured.date)}
                     </p>
-                    <p className="text-sm font-semibold leading-snug text-zinc-900 group-hover:text-brand">
-                      {article.title}
+                    <h3 className="mt-1.5 line-clamp-3 break-words text-lg font-bold leading-snug text-zinc-900 group-hover:text-brand">
+                      {clipText(latestFeatured.title, 90)}
+                    </h3>
+                    <p className="mt-1.5 line-clamp-3 break-words text-sm leading-6 text-zinc-600">
+                      {clipText(latestFeatured.excerpt, 140)}
                     </p>
+                  </div>
+                </Link>
+              </article>
+              <div className="flex min-w-0 flex-1 flex-col gap-3">
+                {latestList.map((article) => (
+                  <Link key={article.id} href={article.href} className="group flex min-h-0 flex-1 items-center gap-3 rounded-xl bg-white p-3">
+                    <div className="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-lg bg-zinc-200">
+                      <MediaImage src={article.image} alt={article.title} sizes="72px" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-brand">
+                        {article.categoryLabel}
+                      </p>
+                      <h3 className="mt-0.5 line-clamp-2 break-words text-sm font-bold leading-snug text-zinc-900 group-hover:text-brand">
+                        {clipText(article.title, 70)}
+                      </h3>
+                      <p className="mt-0.5 line-clamp-1 break-words text-xs leading-5 text-zinc-500">
+                        {clipText(article.excerpt, 70)}
+                      </p>
+                    </div>
                   </Link>
-                </li>
-              ))}
-            </ol>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <aside className="flex w-full flex-col gap-8 lg:w-[432px] lg:shrink-0">
+            <div>
+              <h3 className="text-sm font-bold text-zinc-900">Follow Us</h3>
+              <div className="mt-3 flex h-[55px] w-full max-w-[432px] gap-1">
+                {followerStats.map((item, index) => {
+                  const Icon = socialIcons[item.name];
+                  return (
+                    <a
+                      key={item.name}
+                      href={socialLinks[index].href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn-glass flex h-[55px] w-[105px] shrink-0 items-center gap-2.5 rounded-md p-3"
+                    >
+                      <Icon className="h-4 w-4 shrink-0" style={{ color: item.color }} />
+                      <span className="min-w-0">
+                        <span className="block truncate text-xs font-bold leading-tight text-zinc-800">{item.count}</span>
+                        <span className="block truncate text-[10px] leading-tight text-zinc-500">{item.label}</span>
+                      </span>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-zinc-900">Most Viewed</h3>
+              <ol className="mt-3 flex flex-col gap-3">
+                {viewed.map((article, index) => (
+                  <li key={article.id}>
+                    <Link href={article.href} className="group flex items-start gap-3 rounded-lg bg-white px-3 py-3">
+                      <span className="w-6 shrink-0 text-2xl font-bold leading-none text-zinc-300">{index + 1}</span>
+                      <span className="min-w-0">
+                        <span className="block text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+                          {article.categoryLabel}
+                        </span>
+                        <span className="mt-0.5 line-clamp-2 break-words text-sm font-semibold leading-snug text-zinc-900 group-hover:text-brand">
+                          {clipText(article.title, 64)}
+                        </span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ol>
+            </div>
           </aside>
         </div>
       </SiteWrap>
+      </section>
 
-      <SiteWrap>
+      <SiteWrap className="pt-14">
         <h2 className="mb-6 text-2xl font-bold text-zinc-900">Editor&apos;s Choice</h2>
         <div className="grid gap-6 md:grid-cols-3">
           {choice.map((article) => (
             <Link
               key={article.id}
               href={article.href}
-              className="group overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm"
+              className="group overflow-hidden rounded-xl border border-zinc-200 bg-white"
             >
               <div className="relative aspect-[16/10] bg-zinc-200">
                 <MediaImage
@@ -177,10 +200,12 @@ export default async function NewsPage() {
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-brand">
                   {article.categoryLabel}
                 </p>
-                <h3 className="mt-2 text-lg font-bold leading-snug text-zinc-900 group-hover:text-brand">
-                  {article.title}
+                <h3 className="mt-2 line-clamp-3 break-words text-lg font-bold leading-snug text-zinc-900 group-hover:text-brand">
+                  {clipText(article.title, 90)}
                 </h3>
-                <p className="mt-2 text-sm leading-6 text-zinc-600">{article.excerpt}</p>
+                <p className="mt-2 line-clamp-3 break-words text-sm leading-6 text-zinc-600">
+                  {clipText(article.excerpt, 140)}
+                </p>
               </div>
             </Link>
           ))}

@@ -2,8 +2,8 @@ export function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
-export function unsplash(id: string, width = 1200) {
-  return `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=80`;
+export function unsplash(_id?: string, _width = 1200) {
+  return "/logo.png";
 }
 
 export function titleCase(slug: string) {
@@ -21,17 +21,44 @@ export function slugify(value: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-export function stripHtml(value: string) {
+export function clipText(value: string, max = 90) {
+  const text = value.replace(/\s+/g, " ").trim();
+  if (!text || text.length <= max) return text;
+  return `${text.slice(0, max).replace(/\s+\S*$/, "").trimEnd()}…`;
+}
+
+const HTML_ENTITIES: Record<string, string> = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+  nbsp: " ",
+  rsquo: "’",
+  lsquo: "‘",
+  rdquo: "”",
+  ldquo: "“",
+  mdash: "—",
+  ndash: "–",
+  hellip: "…",
+  laquo: "«",
+  raquo: "»",
+};
+
+export function decodeHtmlEntities(value: string) {
   return value
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;/gi, "'")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/\s+/g, " ")
-    .trim();
+    .replace(/&amp;(#x?[0-9a-f]+|[a-z]+);/gi, "&$1;")
+    .replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, body: string) => {
+      if (body.startsWith("#")) {
+        const code = body[1] === "x" || body[1] === "X" ? Number.parseInt(body.slice(2), 16) : Number(body.slice(1));
+        return Number.isFinite(code) ? String.fromCodePoint(code) : match;
+      }
+      return HTML_ENTITIES[body.toLowerCase()] ?? match;
+    });
+}
+
+export function stripHtml(value: string) {
+  return decodeHtmlEntities(value.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
 }
 
 function parseFlexibleDate(value: string) {
@@ -80,16 +107,20 @@ export function colorFromLabel(label: string) {
   return palette[hash % palette.length];
 }
 
-export function youtubeEmbedUrl(url?: string) {
+export function youtubeVideoId(url?: string) {
   if (!url) return "";
   try {
     const parsed = new URL(url);
     if (!parsed.hostname.includes("youtu")) return "";
-    const id = parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop();
-    return id ? `https://www.youtube.com/embed/${id}?rel=0` : "";
+    return parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop() || "";
   } catch {
     return "";
   }
+}
+
+export function youtubeEmbedUrl(url?: string, params = "") {
+  const id = youtubeVideoId(url);
+  return id ? `https://www.youtube.com/embed/${id}?rel=0${params}` : "";
 }
 
 export function durationToSeconds(value: string) {

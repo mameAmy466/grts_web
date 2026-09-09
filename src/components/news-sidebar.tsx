@@ -2,7 +2,7 @@ import Link from "next/link";
 import { IconChevronRight } from "@/components/icons";
 import { MediaImage } from "@/components/media-image";
 import { categories, editorsChoiceSidebar } from "@/lib/data";
-import { unsplash } from "@/lib/utils";
+import { clipText, unsplash } from "@/lib/utils";
 
 export function NewsSidebar({
   activeCategory,
@@ -13,7 +13,7 @@ export function NewsSidebar({
 }) {
   const list = topics?.length ? topics : categories.filter((item) => item.slug !== "culture");
   return (
-    <aside className="lg:col-span-4">
+    <aside className="lg:sticky lg:top-[calc(var(--site-header)+1rem)] lg:col-span-4 lg:self-start">
       <h2 className="text-lg font-bold text-zinc-900">Explore Topics</h2>
       <ul className="mt-4 divide-y divide-zinc-200 border-y border-zinc-200">
         {list.map((item) => (
@@ -41,12 +41,12 @@ export function NewsSidebar({
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-zinc-200">
                 <MediaImage src={article.image} alt={article.title} sizes="64px" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-brand">
                   {article.categoryLabel}
                 </p>
-                <p className="text-sm font-semibold leading-snug text-zinc-900 group-hover:text-brand">
-                  {article.title}
+                <p className="line-clamp-3 break-words text-sm font-semibold leading-snug text-zinc-900 group-hover:text-brand">
+                  {clipText(article.title, 72)}
                 </p>
               </div>
             </Link>

@@ -3,6 +3,14 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --color-bg-primary: #0A0A0A;
+  --site-header: 68px;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --site-header: 116px;
+  }
 }
 
 @theme inline {
@@ -38,7 +46,20 @@ body {
 }
 
 .wp-content p {
-  margin-bottom: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.wp-content p:empty,
+.wp-content p:has(> br:only-child) {
+  display: none;
+}
+
+.wp-content > *:first-child {
+  margin-top: 0;
+}
+
+.wp-content > *:last-child {
+  margin-bottom: 0;
 }
 
 .wp-content h2,
@@ -57,4 +78,27 @@ body {
 
 .wp-content a {
   color: #e31c23;
+}
+
+.btn-glass {
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: none;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.btn-glass-dark {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.shorts-scroller {
+  scrollbar-width: none;
+}
+
+.shorts-scroller::-webkit-scrollbar {
+  display: none;
 }

@@ -69,7 +69,7 @@ export default async function ProgrammeReplayPage({
             <IconArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        <div className="grid justify-start gap-4 [grid-template-columns:repeat(auto-fill,209px)]">
+        <div className="grid justify-start gap-3 [grid-template-columns:repeat(auto-fill,263px)]">
           {(related.length ? related : relatedReplays(slug)).map((item) => (
             <ReplayVideoCard key={item.id} episode={item} />
           ))}

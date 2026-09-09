@@ -44,6 +44,7 @@ export type ShortItem = {
   image: string;
   duration: string;
   href: string;
+  videoUrl?: string;
 };
 
 export type Episode = {
@@ -105,4 +106,5 @@ export type ReplayEpisode = {
   about: string;
   streamFeedUrl?: string;
   streamUrl?: string;
+  href?: string;
 };

@@ -1,7 +1,7 @@
-import { getJson } from "@/lib/api/http";
+import { getJson, getJsonMeta } from "@/lib/api/http";
 import { WORDPRESS_API_BASE } from "@/lib/env";
 import type { Article, CategorySlug } from "@/lib/types";
-import { formatWpDate, stripHtml } from "@/lib/utils";
+import { decodeHtmlEntities, formatWpDate, stripHtml } from "@/lib/utils";
 
 type WpRendered = { rendered?: string };
 type WpTerm = { id: number; name: string; slug: string; count?: number };
@@ -70,6 +70,7 @@ export async function getNewsNav() {
 
 export async function getWpPosts(options?: {
   perPage?: number;
+  page?: number;
   categoryId?: number;
   slug?: string;
 }) {
@@ -77,6 +78,7 @@ export async function getWpPosts(options?: {
   try {
     const params: Record<string, string | number> = {
       per_page: options?.perPage ?? 12,
+      page: options?.page ?? 1,
       _embed: 1,
     };
     if (options?.categoryId) params.categories = options.categoryId;
@@ -88,6 +90,36 @@ export async function getWpPosts(options?: {
   }
 }
 
+export async function getWpPostsPage(options?: {
+  perPage?: number;
+  page?: number;
+  categoryId?: number;
+}) {
+  const page = options?.page ?? 1;
+  const perPage = options?.perPage ?? 12;
+  if (!WORDPRESS_API_BASE) return { articles: [], page, totalPages: 0, hasMore: false };
+  try {
+    const params: Record<string, string | number> = {
+      per_page: perPage,
+      page,
+      _embed: 1,
+    };
+    if (options?.categoryId) params.categories = options.categoryId;
+    const { data, totalPages } = await getJsonMeta<WpPost[]>(wpUrl("posts", params));
+    return {
+      articles: data.map((post) => {
+        const article = postToArticle(post);
+        return { ...article, contentHtml: undefined, sections: undefined };
+      }),
+      page,
+      totalPages,
+      hasMore: page < totalPages,
+    };
+  } catch {
+    return { articles: [], page, totalPages: 0, hasMore: false };
+  }
+}
+
 export async function getWpPost(category: string, slug: string) {
   const posts = await getWpPosts({ slug, perPage: 1 });
   const article = posts[0];
@@ -96,14 +128,19 @@ export async function getWpPost(category: string, slug: string) {
 }
 
 function postToArticle(post: WpPost): Article {
-  const terms = post._embedded?.["wp:term"]?.[0] ?? [];
-  const category = terms[0];
+  const groups = post._embedded?.["wp:term"] ?? [];
+  const categories = groups[0] ?? [];
+  const extraTerms = groups.slice(1).flat();
+  const category = categories[0];
   const media = post._embedded?.["wp:featuredmedia"]?.[0];
   const author = post._embedded?.author?.[0];
   const title = stripHtml(post.title?.rendered ?? "");
   const excerpt = stripHtml(post.excerpt?.rendered ?? "");
-  const content = post.content?.rendered ?? "";
+  const content = decodeHtmlEntities(post.content?.rendered ?? "");
   const categorySlug = (category?.slug ?? "general-news") as CategorySlug;
+  const tags = [...categories, ...extraTerms]
+    .map((term) => term.name.trim())
+    .filter((name, index, list) => name && list.indexOf(name) === index);
 
   return {
     id: String(post.id),
@@ -120,7 +157,7 @@ function postToArticle(post: WpPost): Article {
     authorImage: author?.avatar_urls?.["96"],
     lead: excerpt,
     sections: [],
-    tags: terms.map((term) => term.name),
+    tags,
     contentHtml: content,
   };
 }

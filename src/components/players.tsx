@@ -96,8 +96,9 @@ export function LiveVideoPlayer({
             sizes="(min-width: 1024px) 66vw, 100vw"
           />
         )}
-        <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-brand px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
-          ● Live now
+        <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-brand px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
+          <span className="h-1.5 w-1.5 rounded-full bg-white" />
+          Live now
         </span>
         <div className="absolute inset-x-0 bottom-0 flex items-center gap-3 bg-gradient-to-t from-black/85 to-transparent px-4 py-3 text-white">
           <button
@@ -132,36 +133,53 @@ export function LiveVideoPlayer({
   );
 }
 
+export function LiveNowCopy({
+  title = "Live Now",
+  description,
+}: {
+  title?: string;
+  description?: string;
+}) {
+  return (
+    <div className="mt-5">
+      <h1 className="flex items-center gap-2 text-2xl font-bold text-white md:text-3xl">
+        <span className="h-2.5 w-2.5 rounded-full bg-brand" />
+        {title}
+      </h1>
+      {description ? (
+        <p className="mt-2 max-w-2xl text-sm leading-7 text-zinc-400">{description}</p>
+      ) : null}
+    </div>
+  );
+}
+
 export function LiveRadioCard() {
   const [playing, setPlaying] = useState(false);
 
   return (
-    <div className="mt-4 flex flex-col gap-4 rounded-xl border border-white/10 bg-[#161616] p-4 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <p className="text-sm font-semibold text-white">
-          <span className="text-brand">●</span> Live Now
-        </p>
-        <p className="mt-1 max-w-xl text-sm text-zinc-400">
-          Stay with GRTS television, or switch to radio mode for GRTS FM from Banjul.
-        </p>
-      </div>
-      <div className="flex min-w-[260px] items-center gap-3 rounded-xl bg-[#1f1f1f] px-3 py-2.5">
-        <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand text-white">
+    <div className="mt-5 flex items-center justify-between gap-4 rounded-2xl bg-[#111] px-4 py-3">
+      <div className="flex min-w-0 items-center gap-3">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand text-white">
           <IconRadio className="h-5 w-5" />
         </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-white">GRTS — Live Radio</p>
-          <span className="text-[10px] font-bold uppercase tracking-wide text-brand">Live now</span>
+        <div className="min-w-0">
+          <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-white">
+            GRTS - Live Radio
+            <span className="rounded bg-brand px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide">
+              Live now
+            </span>
+          </p>
+          <p className="mt-0.5 text-xs text-zinc-400">Listen to the radio without using video data</p>
         </div>
-        <button
-          type="button"
-          aria-label={playing ? "Pause radio" : "Play radio"}
-          onClick={() => setPlaying((value) => !value)}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-brand text-white"
-        >
-          {playing ? <IconPause className="h-4 w-4" /> : <IconPlay className="ml-0.5 h-4 w-4" />}
-        </button>
       </div>
+      <button
+        type="button"
+        aria-label={playing ? "Pause radio" : "Play radio"}
+        onClick={() => setPlaying((value) => !value)}
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand text-white"
+      >
+        {playing ? <IconPause className="h-5 w-5" /> : <IconPlay className="ml-0.5 h-5 w-5" />}
+      </button>
     </div>
   );
 }
@@ -184,7 +202,7 @@ export function StickyRadioBar() {
           <p className="truncate text-sm font-semibold text-white">
             GRTS Radio <span className="ml-2 rounded bg-brand px-1.5 py-0.5 text-[10px] font-bold">LIVE</span>
           </p>
-          <p className="text-[11px] text-zinc-400">Banjul, The Gambia</p>
+          <p className="text-[11px] text-zinc-400">National Radio - Gambia</p>
         </div>
         <Waveform className="hidden flex-1 sm:block" accent />
         <div className="hidden items-center gap-3 md:flex">
@@ -200,28 +218,42 @@ export function StickyRadioBar() {
   );
 }
 
-export function FmNowPlaying() {
+export function FmNowPlaying({
+  title = "Morning Show",
+  description = "With Malik & Fatouma. News review, national hot topics, and Afro-fusion tunes to wake you up.",
+  image,
+  time = "08:00 - 12:00 UTC",
+}: {
+  title?: string;
+  description?: string;
+  image?: string;
+  time?: string;
+}) {
   return (
-    <div className="rounded-[12px] border border-white/10 bg-[#171717] p-5">
+    <div className="flex h-[221px] w-full max-w-[460px] flex-col gap-6 rounded-[24px] bg-[#0A0A0A] p-8">
       <div className="flex items-start justify-between gap-3">
-        <span className="rounded-full bg-brand px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
-          ● Live now
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-brand px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
+          <span className="h-1.5 w-1.5 rounded-full bg-white" />
+          Live now
         </span>
-        <span className="text-xs text-zinc-400">08:00 — 12:00 UTC</span>
+        <span className="text-xs text-zinc-500">{time}</span>
       </div>
-      <div className="mt-6 flex items-center gap-4">
-        <div className="relative h-[72px] w-[72px] overflow-hidden rounded-[12px] bg-zinc-700">
+      <div className="flex items-center gap-4">
+        <div className="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-full bg-zinc-700">
           <MediaImage
-            src={unsplash("photo-1475721027785-f74eccf877e2", 300)}
-            alt="Morning Show presenters"
+            src={image || unsplash("photo-1573497019940-1c28c88b4f3e", 300)}
+            alt={title}
             sizes="72px"
           />
+          <span className="absolute inset-0 flex items-center justify-center bg-black/25">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-white">
+              <IconPlay className="ml-0.5 h-3.5 w-3.5" />
+            </span>
+          </span>
         </div>
-        <div>
-          <h2 className="text-xl font-bold text-white">Morning Show</h2>
-          <p className="mt-1 text-sm leading-6 text-zinc-400">
-            With Malik &amp; Fatouma. News review, national hot topics, weather and the week ahead.
-          </p>
+        <div className="min-w-0">
+          <h2 className="text-lg font-bold text-white">{title}</h2>
+          <p className="mt-1 text-sm leading-6 text-zinc-400">{description}</p>
         </div>
       </div>
     </div>
@@ -257,37 +289,41 @@ export function FmPlayerBar({
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-[12px] border border-white/10 bg-[#171717] px-4 py-3 sm:flex-row sm:items-center">
-      <div className="flex min-w-0 items-center gap-3">
-        <div className="relative h-12 w-12 overflow-hidden rounded-[12px] bg-zinc-700">
-          <MediaImage
-            src={image || unsplash("photo-1475721027785-f74eccf877e2", 200)}
-            alt={title}
-            sizes="48px"
-          />
+    <div className="w-full border-t border-[var(--color-bg-primary,#0A0A0A)] bg-[#171717] shadow-[0_-8px_24px_#00000030]">
+      <div className="mx-auto flex h-auto min-h-[88px] w-full max-w-[1512px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-16 xl:px-[180px]">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-[12px] bg-zinc-700">
+            <MediaImage
+              src={image || unsplash("photo-1475721027785-f74eccf877e2", 200)}
+              alt={title}
+              sizes="48px"
+            />
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-white">{title}</p>
+            <span className="rounded bg-brand px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+              Live
+            </span>
+          </div>
         </div>
-        <div>
-          <p className="text-sm font-semibold text-white">{title}</p>
-          <span className="rounded bg-brand px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
-            Live
-          </span>
+        <Waveform className="hidden flex-1 lg:block" accent />
+        <div className="flex items-center gap-4">
+          <div className="hidden items-center gap-2 md:flex">
+            <IconVolume className="h-4 w-4 text-zinc-400" />
+            <span className="h-1 w-20 overflow-hidden rounded-full bg-white/15">
+              <span className="block h-full w-3/4 bg-brand" />
+            </span>
+          </div>
+          <button
+            type="button"
+            aria-label={playing ? "Pause" : "Play"}
+            onClick={() => void toggle()}
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand text-white"
+          >
+            {playing ? <IconPause className="h-5 w-5" /> : <IconPlay className="ml-0.5 h-5 w-5" />}
+          </button>
         </div>
       </div>
-      <div className="hidden items-center gap-2 md:flex">
-        <IconVolume className="h-4 w-4 text-zinc-400" />
-        <span className="h-1 w-20 overflow-hidden rounded-full bg-white/15">
-          <span className="block h-full w-3/4 bg-brand" />
-        </span>
-      </div>
-      <Waveform className="hidden flex-1 lg:block" accent />
-      <button
-        type="button"
-        aria-label={playing ? "Pause" : "Play"}
-        onClick={() => void toggle()}
-        className="ml-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand text-white"
-      >
-        {playing ? <IconPause className="h-5 w-5" /> : <IconPlay className="ml-0.5 h-5 w-5" />}
-      </button>
     </div>
   );
 }

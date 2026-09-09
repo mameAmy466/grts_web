@@ -24,30 +24,35 @@ export default async function RadioPage() {
 
   return (
     <div className="bg-[#0d0d0d] pb-20">
-      <SiteWrap className="py-12 md:py-16">
-        <div className="grid items-center gap-8 lg:grid-cols-2">
-          <div>
-            <h1 className="text-5xl font-bold tracking-tight text-white md:text-6xl">
-              {current?.title ?? "GRTS FM"}
+      <section className="bg-[#171717]">
+        <div className="mx-auto flex min-h-[294px] w-full max-w-[1514px] flex-col justify-center gap-8 px-4 py-7 sm:px-6 lg:flex-row lg:items-center lg:gap-[88px] lg:px-16 xl:px-[185px]">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-4xl font-bold tracking-tight text-zinc-300 md:text-5xl">
+              GRTS FM
             </h1>
-            <p className="mt-2 text-3xl font-semibold text-white">106.7 FM</p>
-            <p className="mt-4 max-w-md text-sm leading-7 text-zinc-400">
+            <p className="mt-2 flex items-center text-3xl font-bold text-white md:text-4xl">
+              106
+              <span className="mx-1.5 inline-block h-3 w-3 rounded-full bg-brand md:h-3.5 md:w-3.5" />
+              7 FM
+            </p>
+            <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-400">
               {current?.desc ||
-                "Broadcasting from Banjul — news, conversation, music and community programmes on Radio Gambia, across the country."}
+                "Broadcasting live from Banjul. Bringing you the absolute best in national news, African sports, culture development, and high-fidelity sound."}
             </p>
           </div>
-          <FmNowPlaying />
+          <div className="w-full shrink-0 lg:w-[460px]">
+            <FmNowPlaying image={current?.hd_logo || current?.sd_logo} />
+          </div>
         </div>
-        <div className="mt-8">
-          <FmPlayerBar
-            streamUrl={current?.stream_url}
-            title={current?.title ?? "Morning Show"}
-            image={current?.hd_logo || current?.sd_logo}
-          />
-        </div>
-      </SiteWrap>
+      </section>
 
-      <SiteWrap>
+      <FmPlayerBar
+        streamUrl={current?.stream_url}
+        title={current?.title ?? "Morning Show"}
+        image={current?.hd_logo || current?.sd_logo}
+      />
+
+      <SiteWrap className="pt-12">
         <SectionHeading title="Recent Episodes" />
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {(radioEpisodes.length ? radioEpisodes : episodes).map((episode) => (

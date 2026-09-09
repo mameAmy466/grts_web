@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { IconClock, IconPlay } from "@/components/icons";
+import { IconArrowRight, IconClock, IconPlay } from "@/components/icons";
 import { MediaImage } from "@/components/media-image";
 import type { Article, Episode, ShortItem, VideoItem } from "@/lib/types";
-import { cn, formatDisplayDate } from "@/lib/utils";
+import { clipText, cn, formatDisplayDate } from "@/lib/utils";
 
 export function PlayBadge({ className }: { className?: string }) {
   return (
@@ -61,12 +61,12 @@ export function ShortCard({ item }: { item: ShortItem }) {
         <MediaImage
           src={item.image}
           alt={item.title}
-          sizes="(min-width: 1024px) 20vw, 50vw"
+          sizes="168px"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
         <Duration value={item.duration} className="top-2 right-2 bottom-auto" />
         <div className="absolute inset-x-0 bottom-0 p-3">
-          <p className="text-sm font-semibold leading-snug text-white">{item.title}</p>
+          <p className="line-clamp-3 break-words text-sm font-semibold leading-snug text-white">{item.title}</p>
           <p className="mt-1 text-[11px] uppercase tracking-wide text-zinc-300">{item.category}</p>
         </div>
       </div>
@@ -89,11 +89,11 @@ export function NewsThumbRow({
       <div className="min-w-0">
         <h3
           className={cn(
-            "text-sm font-semibold leading-snug group-hover:text-brand",
+            "line-clamp-3 break-words text-sm font-semibold leading-snug group-hover:text-brand",
             theme === "dark" ? "text-white" : "text-zinc-900",
           )}
         >
-          {article.title}
+          {clipText(article.title, 72)}
         </h3>
         <p className="mt-1 text-xs text-zinc-500">{formatDisplayDate(article.date)}</p>
       </div>
@@ -121,11 +121,11 @@ export function NewsGridCard({
       </p>
       <h3
         className={cn(
-          "mt-1 text-[15px] font-semibold leading-snug group-hover:text-brand",
+          "mt-1 line-clamp-3 break-words text-[15px] font-semibold leading-snug group-hover:text-brand",
           theme === "dark" ? "text-white" : "text-zinc-900",
         )}
       >
-        {article.title}
+        {clipText(article.title, 90)}
       </h3>
       <p className="mt-1.5 text-xs text-zinc-500">{formatDisplayDate(article.date)}</p>
     </Link>
@@ -142,8 +142,8 @@ export function NewsOverlayCard({
   large?: boolean;
 }) {
   return (
-    <Link href={article.href} className={cn("group relative block overflow-hidden rounded-xl", className)}>
-      <div className={cn("relative bg-zinc-800", large ? "min-h-[360px] aspect-[16/10] md:min-h-[420px]" : "aspect-[16/10]")}>
+    <Link href={article.href} className={cn("group relative block h-full overflow-hidden rounded-xl", className)}>
+      <div className={cn("relative h-full bg-zinc-800", large ? "aspect-[16/10] min-h-[360px] md:min-h-[420px]" : "aspect-[16/10]")}>
         <MediaImage
           src={article.image}
           alt={article.title}
@@ -154,8 +154,8 @@ export function NewsOverlayCard({
           <span className="inline-block rounded bg-brand px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
             {article.categoryLabel}
           </span>
-          <h3 className={cn("mt-2 font-bold leading-tight text-white", large ? "text-2xl md:text-3xl" : "text-lg")}>
-            {article.title}
+          <h3 className={cn("mt-2 line-clamp-3 break-words font-bold leading-tight text-white", large ? "text-2xl md:text-3xl" : "text-lg")}>
+            {clipText(article.title, large ? 110 : 90)}
           </h3>
           <p className="mt-2 text-xs text-zinc-300">{formatDisplayDate(article.date)}</p>
         </div>
@@ -167,12 +167,14 @@ export function NewsOverlayCard({
 export function SideNewsRow({
   article,
   theme = "dark",
+  className,
 }: {
   article: Article;
   theme?: "dark" | "light";
+  className?: string;
 }) {
   return (
-    <Link href={article.href} className="group flex gap-3">
+    <Link href={article.href} className={cn("group flex items-center gap-3", className)}>
       <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-md bg-zinc-200">
         <MediaImage src={article.image} alt={article.title} sizes="140px" />
       </div>
@@ -182,11 +184,11 @@ export function SideNewsRow({
         </p>
         <h3
           className={cn(
-            "mt-1 text-sm font-semibold leading-snug group-hover:text-brand",
+            "mt-1 line-clamp-3 break-words text-sm font-semibold leading-snug group-hover:text-brand",
             theme === "dark" ? "text-white" : "text-zinc-900",
           )}
         >
-          {article.title}
+          {clipText(article.title, 80)}
         </h3>
         <p className="mt-1 text-xs text-zinc-500">{formatDisplayDate(article.date)}</p>
       </div>
@@ -244,12 +246,10 @@ function WaveArt() {
 export function SectionHeading({
   title,
   href,
-  action = "See more +",
   theme = "dark",
 }: {
   title: string;
   href?: string;
-  action?: string;
   theme?: "dark" | "light";
 }) {
   return (
@@ -258,8 +258,15 @@ export function SectionHeading({
         {title}
       </h2>
       {href ? (
-        <Link href={href} className="text-sm font-medium text-zinc-400 hover:text-brand">
-          {action}
+        <Link
+          href={href}
+          aria-label={`See more: ${title}`}
+          className={cn(
+            "flex h-9 w-9 items-center justify-center rounded-full",
+            theme === "dark" ? "btn-glass-dark text-white hover:text-brand" : "btn-glass text-zinc-700 hover:text-brand",
+          )}
+        >
+          <IconArrowRight className="h-4 w-4" />
         </Link>
       ) : null}
     </div>
