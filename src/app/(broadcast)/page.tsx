@@ -3,46 +3,36 @@ import {
   NewsGridCard,
   NewsOverlayCard,
   NewsThumbRow,
-  PlayBadge,
   SectionHeading,
   SideNewsRow,
   VideoCard,
 } from "@/components/cards";
 import { IconArrowRight } from "@/components/icons";
-import { MediaImage, SiteWrap } from "@/components/media-image";
+import { SiteWrap } from "@/components/media-image";
 import { ShortsRow } from "@/components/shorts-row";
-import {
-  homeHeadlines,
-  homeNewsGrid,
-  homeTopNews,
-  latestVideos,
-  popularVideos,
-  shorts,
-  watchAgainFeatured,
-  watchAgainSide,
-} from "@/lib/data";
+import { WatchAgain } from "@/components/watch-again";
+import { homeHeadlines, homeNewsGrid, homeTopNews } from "@/lib/data";
 
 import { getTveReplayVideos, getTveShorts, getTveSliders } from "@/lib/api/tve";
-import { getWpPosts } from "@/lib/api/wordpress";
-import { formatDisplayDate } from "@/lib/utils";
+import { getNewsPosts } from "@/lib/api/news";
 
 export const revalidate = 120;
 
 export default async function HomePage() {
-  const [posts, sliders, replays, apiShorts] = await Promise.all([
-    getWpPosts({ perPage: 12 }),
+  const [choice, posts, sliders, replays, apiShorts] = await Promise.all([
+    getNewsPosts({ categorySlug: "editors-choice", perPage: 12 }),
+    getNewsPosts({ perPage: 12 }),
     getTveSliders(),
-    getTveReplayVideos(12),
+    getTveReplayVideos(16),
     getTveShorts(10),
   ]);
-  const topNews = posts.slice(0, 4).length ? posts.slice(0, 4) : homeTopNews;
-  const featured = posts[0] ?? homeHeadlines.featured;
-  const side = posts.slice(1, 5).length >= 4 ? posts.slice(1, 5) : homeHeadlines.side;
-  const grid = posts.slice(5, 9).length ? posts.slice(5, 9) : homeNewsGrid;
-  const videos = sliders.length ? sliders : latestVideos;
-  const replayFeatured = replays[0] ?? watchAgainFeatured;
-  const replaySide = replays.slice(1, 4);
-  const replayGrid = replays.slice(4, 8);
+  const news = [...choice, ...posts.filter((item) => !choice.some((picked) => picked.id === item.id))];
+  const topNews = news.slice(0, 4).length ? news.slice(0, 4) : homeTopNews;
+  const featured = news[0] ?? homeHeadlines.featured;
+  const side = news.slice(1, 5).length >= 4 ? news.slice(1, 5) : homeHeadlines.side;
+  const grid = news.slice(5, 9).length ? news.slice(5, 9) : homeNewsGrid;
+  const replayVideos = replays.length ? replays : sliders;
+  const popularVideos = (sliders.length ? sliders : replayVideos).slice(0, 4);
 
   return (
     <div className="pb-20">
@@ -92,65 +82,31 @@ export default async function HomePage() {
         </div>
       </SiteWrap>
 
-      <SiteWrap className="pb-12">
-        <SectionHeading title="Watch Again" href="/programmes" />
-        <div className="grid w-full gap-2 lg:grid-cols-[minmax(0,647fr)_minmax(0,463fr)] lg:items-start">
-          <Link
-            href={replayFeatured.href}
-            className="group relative block h-[364px] w-full overflow-hidden rounded-lg border border-[var(--color-bg-primary,#0A0A0A)] bg-zinc-800"
-          >
-            <MediaImage src={replayFeatured.image} alt={replayFeatured.title} />
-            <PlayBadge className="absolute left-5 top-4" />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent pb-5 pl-5 pr-5 pt-10">
-              <h3 className="text-xl font-bold text-white">{replayFeatured.title}</h3>
-              <p className="mt-1 text-xs text-zinc-300">
-                {formatDisplayDate(replayFeatured.posted)} · {replayFeatured.duration}
-              </p>
-            </div>
-          </Link>
-          <div className="flex w-full flex-col gap-2">
-            {(replaySide.length ? replaySide : watchAgainSide).map((video) => (
-              <Link
-                key={video.id}
-                href={video.href}
-                className="group flex h-[114px] w-full items-center gap-4 rounded-lg border border-[var(--color-bg-primary,#0A0A0A)] pb-4 pl-2.5 pr-4 pt-4"
-              >
-                <div className="relative h-full w-[128px] shrink-0 overflow-hidden rounded-md bg-zinc-800">
-                  <MediaImage src={video.image} alt={video.title} sizes="128px" />
-                  <span className="absolute bottom-1.5 right-1.5 rounded bg-black/75 px-1.5 py-0.5 text-[10px] text-white">
-                    {video.duration}
-                  </span>
-                </div>
-                <div className="min-w-0">
-                  <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-white group-hover:text-brand">
-                    {video.title}
-                  </h3>
-                  <p className="mt-1 text-xs text-zinc-400">{formatDisplayDate(video.posted)}</p>
-                </div>
-              </Link>
+      {replayVideos.length ? (
+        <section className="bg-[#111] py-12">
+          <SiteWrap>
+            <WatchAgain videos={replayVideos} />
+          </SiteWrap>
+        </section>
+      ) : null}
+
+      {apiShorts.length ? (
+        <SiteWrap className="pb-12">
+          <SectionHeading title="Our Shorts" href="/shorts" />
+          <ShortsRow items={apiShorts} />
+        </SiteWrap>
+      ) : null}
+
+      {popularVideos.length ? (
+        <SiteWrap>
+          <SectionHeading title="Most popular videos" href="/programmes" />
+          <div className="grid grid-cols-[repeat(auto-fill,267px)] justify-start gap-2">
+            {popularVideos.map((video) => (
+              <VideoCard key={video.id} video={video} />
             ))}
           </div>
-        </div>
-        <div className="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-4">
-          {(replayGrid.length ? replayGrid : videos.slice(0, 4)).map((video) => (
-            <VideoCard key={video.id} video={video} className="max-w-none" />
-          ))}
-        </div>
-      </SiteWrap>
-
-      <SiteWrap className="pb-12">
-        <SectionHeading title="Our Shorts" href="/shorts" />
-        <ShortsRow items={apiShorts.length ? apiShorts : shorts} />
-      </SiteWrap>
-
-      <SiteWrap>
-        <SectionHeading title="Most popular videos" href="/programmes" />
-        <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
-          {(sliders.length ? sliders.slice(4, 8) : popularVideos).map((video) => (
-            <VideoCard key={video.id} video={video} className="max-w-none" />
-          ))}
-        </div>
-      </SiteWrap>
+        </SiteWrap>
+      ) : null}
     </div>
   );
 }

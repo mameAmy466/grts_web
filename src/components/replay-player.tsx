@@ -42,9 +42,9 @@ export function ReplayPlayer({ episode }: { episode: ReplayEpisode }) {
   const hasStream = Boolean(episode.streamUrl);
 
   return (
-    <div>
-      <div className="overflow-hidden rounded-xl bg-black">
-        <div className="relative aspect-video">
+    <div className="flex h-full flex-col">
+      <div className="relative rounded-2xl bg-black">
+        <div className="relative aspect-video overflow-hidden rounded-2xl">
           {youtubeSrc ? (
             <iframe
               src={youtubeSrc}
@@ -57,7 +57,6 @@ export function ReplayPlayer({ episode }: { episode: ReplayEpisode }) {
             <HlsPlayer
               src={episode.streamUrl}
               poster={episode.image}
-              controls
               className="absolute inset-0 h-full w-full object-cover"
             />
           ) : (
@@ -81,31 +80,31 @@ export function ReplayPlayer({ episode }: { episode: ReplayEpisode }) {
               </span>
             </button>
           )}
-          {youtubeSrc ? null : (
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent px-4 pb-3 pt-10">
-              <div className="mb-2 h-1 overflow-hidden rounded-full bg-white/25">
-                <div className="h-full rounded-full bg-white" style={{ width: `${progress}%` }} />
-              </div>
-              <div className="flex items-center gap-3 text-white">
-                <button
-                  type="button"
-                  aria-label={playing ? "Pause" : "Play"}
-                  onClick={() => setPlaying((value) => !value)}
-                >
-                  {playing ? <IconPause className="h-4 w-4" /> : <IconPlay className="h-4 w-4" />}
-                </button>
-                <IconVolume className="h-4 w-4" />
-                <span className="h-1 w-16 overflow-hidden rounded-full bg-white/20">
-                  <span className="block h-full w-2/3 bg-white" />
-                </span>
-                <span className="text-[11px] tabular-nums text-zinc-200">
-                  {formatTime(current)} / {formatTime(episode.durationSeconds)}
-                </span>
-                <IconExpand className="ml-auto h-4 w-4" />
-              </div>
-            </div>
-          )}
         </div>
+        {youtubeSrc ? null : (
+          <div className="player-controls-glass absolute inset-x-0 bottom-0 z-10 flex flex-col justify-end text-white backdrop-blur-[18px]">
+            <div className="h-1 overflow-hidden rounded-full bg-white/25">
+              <div className="h-full rounded-full bg-white" style={{ width: `${progress}%` }} />
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                aria-label={playing ? "Pause" : "Play"}
+                onClick={() => setPlaying((value) => !value)}
+              >
+                {playing ? <IconPause className="h-5 w-5" /> : <IconPlay className="h-5 w-5" />}
+              </button>
+              <IconVolume className="h-5 w-5" />
+              <span className="h-1 w-16 overflow-hidden rounded-full bg-white/20">
+                <span className="block h-full w-2/3 bg-white" />
+              </span>
+              <span className="text-[11px] tabular-nums text-zinc-200">
+                {formatTime(current)} / {formatTime(episode.durationSeconds)}
+              </span>
+              <IconExpand className="ml-auto h-5 w-5" />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="mt-5">

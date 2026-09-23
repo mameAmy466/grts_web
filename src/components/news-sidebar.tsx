@@ -1,16 +1,20 @@
 import Link from "next/link";
 import { IconChevronRight } from "@/components/icons";
 import { MediaImage } from "@/components/media-image";
+import { StayConnectedCard } from "@/components/stay-connected-card";
+import { getNewsPosts } from "@/lib/api/news";
 import { categories, editorsChoiceSidebar } from "@/lib/data";
-import { clipText, unsplash } from "@/lib/utils";
+import { clipText } from "@/lib/utils";
 
-export function NewsSidebar({
+export async function NewsSidebar({
   activeCategory,
   topics,
 }: {
   activeCategory: string;
   topics?: { slug: string; label: string }[];
 }) {
+  const choice = await getNewsPosts({ categorySlug: "editors-choice", perPage: 3 });
+  const picks = choice.length ? choice.slice(0, 3) : editorsChoiceSidebar.slice(0, 3);
   const list = topics?.length ? topics : categories.filter((item) => item.slug !== "culture");
   return (
     <aside className="lg:sticky lg:top-[calc(var(--site-header)+1rem)] lg:col-span-4 lg:self-start">
@@ -35,7 +39,7 @@ export function NewsSidebar({
 
       <h2 className="mt-8 text-lg font-bold text-zinc-900">Editor&apos;s Choice</h2>
       <ul className="mt-4 space-y-4">
-        {editorsChoiceSidebar.slice(0, 3).map((article) => (
+        {picks.map((article) => (
           <li key={article.id}>
             <Link href={article.href} className="group flex gap-3">
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-zinc-200">
@@ -54,22 +58,8 @@ export function NewsSidebar({
         ))}
       </ul>
 
-      <div className="relative mt-8 overflow-hidden rounded-xl bg-[#0b3d91] p-5 text-white">
-        <div className="absolute inset-y-0 right-0 w-1/2">
-          <MediaImage
-            src={unsplash("photo-1573497019940-1c28c88b4f3e", 500)}
-            alt=""
-            sizes="200px"
-            className="opacity-50"
-          />
-        </div>
-        <p className="relative text-xs font-semibold uppercase tracking-[0.16em] text-sky-200">
-          Stay Connected
-        </p>
-        <p className="relative mt-2 max-w-[180px] text-lg font-bold leading-snug">
-          Unlimited Data Plans Starting at D199/month
-        </p>
-        <p className="relative mt-4 text-sm font-bold">QCell</p>
+      <div className="mt-8">
+        <StayConnectedCard />
       </div>
     </aside>
   );

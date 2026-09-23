@@ -15,15 +15,18 @@ export function ProgrammesCatalog({
   filters?: CatalogFilter[];
 }) {
   const chips = useMemo(() => {
-    if (filters?.length) return [{ id: "all", label: "All" }, ...filters];
-    const unique = [...new Set(programmes.map((item) => item.filter).filter(Boolean))];
-    return [
-      { id: "all", label: "All" },
-      ...unique.map((id) => ({
-        id,
-        label: programmes.find((item) => item.filter === id)?.badge ?? id,
-      })),
-    ];
+    const counts = programmes.reduce<Record<string, number>>((acc, item) => {
+      if (item.filter) acc[item.filter] = (acc[item.filter] ?? 0) + 1;
+      return acc;
+    }, {});
+    const source = filters?.length
+      ? filters
+      : [...new Set(programmes.map((item) => item.filter).filter(Boolean))].map((id) => ({
+          id,
+          label: programmes.find((item) => item.filter === id)?.badge ?? id,
+        }));
+    const filled = source.filter((item) => (counts[item.id] ?? 0) > 0);
+    return [{ id: "all", label: "All" }, ...filled];
   }, [filters, programmes]);
 
   const [filter, setFilter] = useState("all");

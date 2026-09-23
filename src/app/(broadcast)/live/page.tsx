@@ -1,62 +1,52 @@
 import type { Metadata } from "next";
-import { SectionHeading, VideoCard } from "@/components/cards";
-import { SiteWrap } from "@/components/media-image";
-import { LiveNowCopy, LiveRadioCard, LiveVideoPlayer, StickyRadioBar } from "@/components/players";
+import { Suspense } from "react";
+import { LiveDesk, LiveLatestVideos } from "@/components/live-desk";
 import { ProgramGuide } from "@/components/program-guide";
-import { getLivePlayback, getLiveTvChannels, getTveGuideSlots, getTveSliders } from "@/lib/api/tve";
-import { latestVideos } from "@/lib/data";
+import { getLivePlayback, getLiveTvChannels, getTveGuideSlots, getTveReplayVideos, getTveSliders } from "@/lib/api/tve";
 
 export const metadata: Metadata = {
   title: "Live",
 };
 
-export const revalidate = 60;
+export const revalidate = 20;
 
 const fallbackDescription =
   "Watch GRTS TV live or switch to radio mode. Follow The Gambia's political, economic and social news in real time.";
 
+async function LiveGuide() {
+  const guide = await getTveGuideSlots();
+  return <ProgramGuide todaySlots={guide} />;
+}
+
+async function LiveLatest() {
+  const [sliders, replays] = await Promise.all([getTveSliders(), getTveReplayVideos(8)]);
+  const withStream = sliders.filter((video) => video.streamUrl);
+  return <LiveLatestVideos videos={(withStream.length ? withStream : replays).slice(0, 4)} />;
+}
+
 export default async function LivePage() {
-  const [channels, sliders, guide] = await Promise.all([
-    getLiveTvChannels(),
-    getTveSliders(),
-    getTveGuideSlots(),
-  ]);
+  const channels = await getLiveTvChannels();
   const channel = channels[0];
-  const stream = channel?.id ? await getLivePlayback(channel.id) : "";
-  const videos = sliders.length ? sliders.slice(0, 4) : latestVideos.slice(0, 4);
+  const stream = channel?.id ? await getLivePlayback(String(channel.id)) : "";
 
   return (
     <div className="bg-[#0A0A0A] pb-28">
-      <SiteWrap className="py-8">
-        <div className="grid items-start gap-6 lg:grid-cols-12">
-          <div className="lg:col-span-8">
-            <LiveVideoPlayer
-              src={stream}
-              poster={channel?.logo_url || channel?.logo}
-              title={channel ? `${channel.title} — Live Broadcast` : "GRTS TV — Live Broadcast"}
-            />
-            <LiveNowCopy
-              title="Live Now"
-              description={channel?.desc || fallbackDescription}
-            />
-            <LiveRadioCard />
-          </div>
-          <div className="lg:col-span-4">
-            <ProgramGuide todaySlots={guide} />
-          </div>
-        </div>
-      </SiteWrap>
-
-      <SiteWrap className="border-t border-white/10 pt-8">
-        <SectionHeading title="Latest videos" href="/programmes" />
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {videos.map((video) => (
-            <VideoCard key={video.id} video={video} />
-          ))}
-        </div>
-      </SiteWrap>
-
-      <StickyRadioBar />
+      <LiveDesk
+        src={stream}
+        channelId={channel?.id}
+        liveTitle={channel ? `${channel.title} — Live Broadcast` : "GRTS TV — Live Broadcast"}
+        liveDescription={channel?.desc || fallbackDescription}
+        guide={
+          <Suspense fallback={<div className="h-[420px] animate-pulse rounded-xl bg-white/5" />}>
+            <LiveGuide />
+          </Suspense>
+        }
+        latest={
+          <Suspense fallback={null}>
+            <LiveLatest />
+          </Suspense>
+        }
+      />
     </div>
   );
 }

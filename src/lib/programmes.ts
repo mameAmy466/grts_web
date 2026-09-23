@@ -307,7 +307,7 @@ export function getReplay(slug: string) {
   return replayEpisodes.find((item) => item.programSlug === slug);
 }
 
-export function upNextEpisodes(slug: string, count = 5) {
+export function upNextEpisodes(slug: string, count = 7) {
   return replayEpisodes.filter((item) => item.programSlug !== slug).slice(0, count);
 }
 

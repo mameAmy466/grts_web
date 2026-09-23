@@ -15,7 +15,7 @@ import {
   getCategory,
   relatedArticles,
 } from "@/lib/data";
-import { getWpPosts } from "@/lib/api/wordpress";
+import { getNewsPost, getNewsPosts } from "@/lib/api/news";
 import type { Article } from "@/lib/types";
 import { clipText, formatDisplayDate, unsplash } from "@/lib/utils";
 
@@ -32,8 +32,8 @@ export async function generateMetadata({
   params: Promise<{ category: string; slug: string }>;
 }): Promise<Metadata> {
   const { category, slug } = await params;
-  const fromWp = (await getWpPosts({ slug, perPage: 1 }))[0];
-  const article = fromWp ?? getArticle(category, slug);
+  const fromApi = await getNewsPost(category, slug);
+  const article = fromApi ?? getArticle(category, slug);
   return { title: article?.title ?? "News" };
 }
 
@@ -76,13 +76,15 @@ export default async function NewsArticlePage({
   params: Promise<{ category: string; slug: string }>;
 }) {
   const { category, slug } = await params;
-  const fromWp = (await getWpPosts({ slug, perPage: 1 }))[0];
-  const article = fromWp ?? getArticle(category, slug);
+  const fromApi = await getNewsPost(category, slug);
+  const article = fromApi ?? getArticle(category, slug);
   const meta = getCategory(category) ?? { slug: category, label: article?.categoryLabel ?? category };
   if (!article) notFound();
 
   const body = articleBody(article);
-  const others = (await getWpPosts({ perPage: 12 })).filter((item) => item.id !== article.id);
+  const others = (await getNewsPosts({ perPage: 12, categorySlug: article.category })).filter(
+    (item) => item.id !== article.id,
+  );
   const sameCategory = others.filter((item) => item.category === article.category);
   const related = (sameCategory.length ? sameCategory : others.length ? others : relatedArticles(article)).slice(
     0,

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Duration } from "@/components/cards";
 import { MediaImage } from "@/components/media-image";
 import type { Program } from "@/lib/types";
 
@@ -18,6 +19,7 @@ export function ProgramCard({ program }: { program: Program }) {
         >
           {program.badge}
         </span>
+        <Duration value={program.duration || ""} className="top-3 right-3 bottom-auto" />
         <div className="absolute inset-x-0 bottom-0 p-3">
           <h3 className="text-base font-bold leading-snug text-white group-hover:text-brand">
             {program.title}

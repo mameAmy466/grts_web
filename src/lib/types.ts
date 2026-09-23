@@ -32,9 +32,13 @@ export type VideoItem = {
   title: string;
   image: string;
   posted: string;
+  description?: string;
+  category?: string;
+  views?: string;
   duration: string;
   href: string;
   streamFeedUrl?: string;
+  streamUrl?: string;
 };
 
 export type ShortItem = {
@@ -80,16 +84,25 @@ export type Program = {
   badgeColor: string;
   filter: string;
   schedule: string;
+  duration?: string;
   image: string;
   poster?: string;
   description: string;
   feedUrl?: string;
   videoFeedUrl?: string;
+  streamUrl?: string;
 };
 
 export type CatalogFilter = {
   id: string;
   label: string;
+};
+
+export type RadioStation = {
+  title: string;
+  description: string;
+  streamUrl: string;
+  image?: string;
 };
 
 export type ReplayEpisode = {

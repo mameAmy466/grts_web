@@ -4,6 +4,7 @@ import { BreakingTicker } from "@/components/breaking-ticker";
 import { NewsGridCard } from "@/components/cards";
 import { socialIcons } from "@/components/icons";
 import { MediaImage, SiteWrap } from "@/components/media-image";
+import { StayConnectedCard } from "@/components/stay-connected-card";
 import {
   editorsChoice,
   followerStats,
@@ -13,7 +14,7 @@ import {
   newsHero,
   socialLinks,
 } from "@/lib/data";
-import { getWpPosts } from "@/lib/api/wordpress";
+import { getNewsPosts } from "@/lib/api/news";
 import { clipText, formatDisplayDate } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -23,18 +24,26 @@ export const metadata: Metadata = {
 export const revalidate = 120;
 
 export default async function NewsPage() {
-  const posts = await getWpPosts({ perPage: 16 });
+  const [posts, breaking, latestBucket, viewedBucket, choiceBucket] = await Promise.all([
+    getNewsPosts({ perPage: 16 }),
+    getNewsPosts({ categorySlug: "breaking-news" }),
+    getNewsPosts({ categorySlug: "latest-new" }),
+    getNewsPosts({ categorySlug: "most-viewed" }),
+    getNewsPosts({ categorySlug: "editors-choice" }),
+  ]);
+  const ticker = breaking.length ? breaking : posts;
   const featured = posts[0] ?? newsHero.featured;
   const compact = posts.slice(1, 4).length ? posts.slice(1, 4) : newsHero.compact;
   const grid = posts.slice(4, 8).length ? posts.slice(4, 8) : newsHero.grid;
-  const latestFeatured = posts[1] ?? latestNewsFeatured;
-  const latestList = posts.slice(2, 6).length >= 4 ? posts.slice(2, 6) : latestNewsList;
-  const viewed = posts.slice(5, 9).length ? posts.slice(5, 9) : mostViewed;
-  const choice = posts.slice(8, 11).length ? posts.slice(8, 11) : editorsChoice;
+  const latestSource = latestBucket.length ? latestBucket : posts;
+  const latestFeatured = latestSource[0] ?? latestNewsFeatured;
+  const latestList = latestSource.slice(1, 5).length >= 4 ? latestSource.slice(1, 5) : latestNewsList;
+  const viewed = viewedBucket.slice(0, 4).length ? viewedBucket.slice(0, 4) : mostViewed;
+  const choice = choiceBucket.slice(0, 3).length ? choiceBucket.slice(0, 3) : editorsChoice;
 
   return (
     <div className="bg-white pb-16">
-      <BreakingTicker articles={posts.slice(0, 6)} />
+      <BreakingTicker articles={ticker.slice(0, 6)} />
 
       <SiteWrap className="py-10">
         <div className="grid gap-5 lg:grid-cols-12">
@@ -156,6 +165,7 @@ export default async function NewsPage() {
                 })}
               </div>
             </div>
+            <StayConnectedCard />
             <div>
               <h3 className="text-sm font-bold text-zinc-900">Most Viewed</h3>
               <ol className="mt-3 flex flex-col gap-3">

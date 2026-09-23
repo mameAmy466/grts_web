@@ -108,7 +108,22 @@ async function cachedJson<T>(url: string, revalidate: number, key: string) {
   )();
 }
 
+export async function getJsonUncached<T>(url: string): Promise<T | null> {
+  try {
+    return (await loadJson<T>(url)).data;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "request failed";
+    console.warn(`[api] ${message} ${url}`);
+    return null;
+  }
+}
+
 export async function getJson<T>(url: string, revalidate = 120): Promise<T> {
+  if (url.includes("/newsposts/")) {
+    const data = await getJsonUncached<T>(url);
+    if (data == null) throw new Error("request failed");
+    return data;
+  }
   const cached = await cachedJson<T>(url, revalidate, "json");
   if (!cached.ok) throw new Error(cached.message);
   return cached.data;

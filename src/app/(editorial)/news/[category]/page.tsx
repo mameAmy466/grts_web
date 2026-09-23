@@ -5,7 +5,7 @@ import { CategoryArticleFeed } from "@/components/category-article-feed";
 import { MediaImage, SiteWrap } from "@/components/media-image";
 import { NewsSidebar } from "@/components/news-sidebar";
 import { articlesFor, categories, getCategory } from "@/lib/data";
-import { getNewsNav, getWpCategory, getWpPostsPage } from "@/lib/api/wordpress";
+import { getNewsCategory, getNewsNav, getNewsPostsPage } from "@/lib/api/news";
 import type { CategorySlug } from "@/lib/types";
 import { clipText, formatDisplayDate } from "@/lib/utils";
 
@@ -22,7 +22,7 @@ export async function generateMetadata({
   params: Promise<{ category: string }>;
 }): Promise<Metadata> {
   const { category } = await params;
-  const item = (await getWpCategory(category)) ?? getCategory(category);
+  const item = (await getNewsCategory(category)) ?? getCategory(category);
   return { title: item ? `${item.label} news` : "News" };
 }
 
@@ -32,13 +32,13 @@ export default async function NewsCategoryPage({
   params: Promise<{ category: string }>;
 }) {
   const { category } = await params;
-  const wpCategory = await getWpCategory(category);
-  const meta = wpCategory ?? getCategory(category);
+  const tveCategory = await getNewsCategory(category);
+  const meta = tveCategory ?? getCategory(category);
   if (!meta) notFound();
 
-  const feed = wpCategory
-    ? await getWpPostsPage({ categoryId: wpCategory.id, perPage: 10, page: 1 })
-    : { articles: [], hasMore: false };
+  const feed = tveCategory
+    ? await getNewsPostsPage({ categorySlug: category, perPage: 10 })
+    : { articles: [], nextCursor: null, hasMore: false };
   const fallback = getCategory(category) ? articlesFor(category as CategorySlug) : [];
   const articles = feed.articles.length ? feed.articles : fallback;
   const [featured, ...rest] = articles;
@@ -75,8 +75,9 @@ export default async function NewsCategoryPage({
 
           <CategoryArticleFeed
             initialArticles={rest}
-            categoryId={wpCategory?.id ?? 0}
+            categorySlug={tveCategory?.slug ?? ""}
             excludeId={featured.id}
+            initialCursor={feed.nextCursor}
             hasMore={feed.hasMore}
           />
         </div>

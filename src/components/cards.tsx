@@ -3,7 +3,7 @@ import Link from "next/link";
 import { IconArrowRight, IconClock, IconPlay } from "@/components/icons";
 import { MediaImage } from "@/components/media-image";
 import type { Article, Episode, ShortItem, VideoItem } from "@/lib/types";
-import { clipText, cn, formatDisplayDate } from "@/lib/utils";
+import { clipText, cn, formatDisplayDate, isRealDuration } from "@/lib/utils";
 
 export function PlayBadge({ className }: { className?: string }) {
   return (
@@ -19,6 +19,7 @@ export function PlayBadge({ className }: { className?: string }) {
 }
 
 export function Duration({ value, className }: { value: string; className?: string }) {
+  if (!isRealDuration(value)) return null;
   return (
     <span
       className={cn(
@@ -34,18 +35,25 @@ export function Duration({ value, className }: { value: string; className?: stri
 export function VideoCard({
   video,
   className,
+  selected,
+  onSelect,
+  compact,
 }: {
   video: VideoItem;
   className?: string;
+  selected?: boolean;
+  onSelect?: () => void;
+  compact?: boolean;
 }) {
-  return (
-    <Link
-      href={video.href}
-      className={cn(
-        "group flex h-[233px] w-full max-w-[267px] flex-col gap-2.5 overflow-hidden rounded-lg",
-        className,
-      )}
-    >
+  const cardClassName = cn(
+    "group flex h-[233px] w-full max-w-[267px] flex-col gap-2.5 overflow-hidden rounded-lg text-left",
+    selected && "ring-2 ring-brand",
+    className,
+  );
+  const date = formatDisplayDate(video.posted);
+  const description = video.description?.trim();
+  const content = (
+    <>
       <div className="relative h-[150px] w-full shrink-0 overflow-hidden rounded-lg bg-zinc-800">
         <MediaImage
           src={video.image}
@@ -59,8 +67,32 @@ export function VideoCard({
         <h3 className="line-clamp-2 text-sm font-bold leading-snug text-white group-hover:text-brand">
           {video.title}
         </h3>
-        <p className="mt-1 text-xs text-zinc-500">{formatDisplayDate(video.posted)}</p>
+        {compact ? (
+          description || date ? (
+            <p className="mt-1 flex items-center gap-1 text-xs leading-5 text-zinc-400">
+              {description ? <span className="min-w-0 truncate">{description}</span> : null}
+              {description && date ? <span className="shrink-0 text-zinc-500">·</span> : null}
+              {date ? <span className="shrink-0 text-zinc-500">{date}</span> : null}
+            </p>
+          ) : null
+        ) : date ? (
+          <p className="mt-1 text-xs text-zinc-400">{date}</p>
+        ) : null}
       </div>
+    </>
+  );
+
+  if (onSelect) {
+    return (
+      <button type="button" onClick={onSelect} className={cardClassName}>
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <Link href={video.href} className={cardClassName}>
+      {content}
     </Link>
   );
 }

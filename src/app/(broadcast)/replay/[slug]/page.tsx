@@ -6,7 +6,7 @@ import { SiteWrap } from "@/components/media-image";
 import { ReplayPlayer } from "@/components/replay-player";
 import { ReplayVideoCard } from "@/components/replay-video-card";
 import { UpNextPanel } from "@/components/up-next-panel";
-import { getTveReplayEpisodes, getVideoPlayback } from "@/lib/api/tve";
+import { getTveReplayById, getVideoPlayback } from "@/lib/api/tve";
 
 export const revalidate = 60;
 
@@ -16,9 +16,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const episodes = await getTveReplayEpisodes();
-  const current = episodes.find((item) => item.id === slug);
-  return { title: current?.title ?? "Replay TV" };
+  const data = await getTveReplayById(slug);
+  return { title: data?.current.title ?? "Replay TV" };
 }
 
 export default async function ReplayTvPage({
@@ -27,23 +26,23 @@ export default async function ReplayTvPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const episodes = await getTveReplayEpisodes();
-  const current = episodes.find((item) => item.id === slug);
-  if (!current) notFound();
+  const data = await getTveReplayById(slug);
+  if (!data) notFound();
 
   const streamUrl =
-    current.streamUrl || (current.streamFeedUrl ? await getVideoPlayback(current.streamFeedUrl) : "");
-  const episode = { ...current, streamUrl };
-  const others = episodes.filter((item) => item.id !== slug);
+    data.current.streamUrl ||
+    (data.current.streamFeedUrl ? await getVideoPlayback(data.current.streamFeedUrl) : "");
+  const episode = { ...data.current, streamUrl };
+  const others = data.related;
 
   return (
     <div className="pb-20 pt-8">
-      <SiteWrap className="grid gap-8 lg:grid-cols-12">
-        <div className="lg:col-span-8">
+      <SiteWrap className="grid items-stretch gap-8 lg:grid-cols-12">
+        <div className="flex h-full min-h-0 flex-col lg:col-span-8">
           <ReplayPlayer episode={episode} />
         </div>
-        <div className="lg:col-span-4">
-          <UpNextPanel episodes={others.slice(0, 5)} />
+        <div className="flex h-full min-h-0 flex-col lg:col-span-4">
+          <UpNextPanel episodes={others.slice(0, 7)} />
         </div>
       </SiteWrap>
 

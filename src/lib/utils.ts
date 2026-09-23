@@ -129,3 +129,47 @@ export function durationToSeconds(value: string) {
   if (parts.length === 2) return parts[0] * 60 + parts[1];
   return 0;
 }
+
+export function isRealDuration(value?: string) {
+  return Boolean(value && durationToSeconds(value) > 0);
+}
+
+export function formatClockDuration(seconds: number) {
+  if (!Number.isFinite(seconds) || seconds <= 0) return "";
+  const total = Math.round(seconds);
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const rest = total % 60;
+  if (hours > 0) {
+    return `${hours}:${String(minutes).padStart(2, "0")}:${String(rest).padStart(2, "0")}`;
+  }
+  return `${minutes}:${String(rest).padStart(2, "0")}`;
+}
+
+export function isoDurationToSeconds(value?: string) {
+  if (!value) return 0;
+  const match = value.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/i);
+  if (!match) return 0;
+  return (Number(match[1]) || 0) * 3600 + (Number(match[2]) || 0) * 60 + (Number(match[3]) || 0);
+}
+
+export function viewCount(value?: string | number) {
+  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+  if (!value) return 0;
+  const parsed = Number(String(value).replace(/[^\d]/g, ""));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+export function formatViewCount(value?: string | number) {
+  const count = viewCount(value);
+  if (count <= 0) return "";
+  if (count >= 1_000_000) {
+    const compact = count >= 10_000_000 ? Math.round(count / 1_000_000) : Number((count / 1_000_000).toFixed(1));
+    return `${compact}M views`;
+  }
+  if (count >= 1_000) {
+    const compact = count >= 10_000 ? Math.round(count / 1_000) : Number((count / 1_000).toFixed(1));
+    return `${compact}K views`;
+  }
+  return `${count} views`;
+}

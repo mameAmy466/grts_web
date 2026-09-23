@@ -11,7 +11,7 @@ function baseFromAppDetailsUrl(url?: string) {
 export const TVE_APP_SLUG =
   process.env.NEXT_PUBLIC_TVE_APP_SLUG ??
   slugFromAppDetailsUrl(process.env.EXPO_PUBLIC_API_URL) ??
-  "dmedia";
+  "grts";
 
 export const TVE_API_BASE =
   process.env.NEXT_PUBLIC_TVE_API_BASE ??

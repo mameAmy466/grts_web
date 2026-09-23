@@ -1,5 +1,6 @@
 "use client";
 
+import Hls from "hls.js";
 import { useEffect, useRef } from "react";
 
 type HlsPlayerProps = {
@@ -9,6 +10,9 @@ type HlsPlayerProps = {
   controls?: boolean;
   autoPlay?: boolean;
   muted?: boolean;
+  live?: boolean;
+  onReady?: () => void;
+  onError?: (message: string) => void;
   ref?: React.Ref<HTMLVideoElement>;
 };
 
@@ -25,54 +29,98 @@ export function HlsPlayer({
   controls = false,
   autoPlay = false,
   muted = false,
+  live = false,
+  onReady,
+  onError,
   ref,
 }: HlsPlayerProps) {
   const localRef = useRef<HTMLVideoElement | null>(null);
+  const onReadyRef = useRef(onReady);
+  const onErrorRef = useRef(onError);
+  onReadyRef.current = onReady;
+  onErrorRef.current = onError;
 
   useEffect(() => {
     const video = localRef.current;
     if (!video || !src) return;
 
+    const ready = () => onReadyRef.current?.();
+    const fail = (message: string) => onErrorRef.current?.(message);
     const tryPlay = () => {
-      if (autoPlay) void video.play().catch(() => undefined);
+      if (!autoPlay) return;
+      void video.play().catch(() => undefined);
     };
+
+    video.addEventListener("playing", ready);
+    video.addEventListener("loadeddata", ready);
+    const resume = () => {
+      if (live && video.paused && autoPlay) void video.play().catch(() => undefined);
+    };
+    video.addEventListener("waiting", resume);
+    const onVideoError = () => fail(video.error?.message || "Live stream unavailable");
+    video.addEventListener("error", onVideoError);
+
+    if (Hls.isSupported() && src.includes(".m3u8")) {
+      const instance = new Hls({
+        enableWorker: true,
+        lowLatencyMode: live,
+        backBufferLength: live ? 30 : 90,
+        liveSyncDurationCount: 2,
+        liveMaxLatencyDurationCount: 6,
+        startLevel: live ? 0 : -1,
+        capLevelToPlayerSize: true,
+        maxBufferLength: live ? 8 : 30,
+        maxMaxBufferLength: live ? 15 : 60,
+        manifestLoadingTimeOut: 8000,
+        levelLoadingTimeOut: 8000,
+        fragLoadingTimeOut: 10000,
+        manifestLoadingMaxRetry: 3,
+        levelLoadingMaxRetry: 3,
+      });
+      instance.loadSource(src);
+      instance.attachMedia(video);
+      instance.on(Hls.Events.MANIFEST_PARSED, tryPlay);
+      instance.on(Hls.Events.ERROR, (_event, data) => {
+        if (!data.fatal) return;
+        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+          instance.startLoad();
+          return;
+        }
+        if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+          instance.recoverMediaError();
+          return;
+        }
+        fail(data.details || "Live stream unavailable");
+      });
+
+      return () => {
+        video.removeEventListener("playing", ready);
+        video.removeEventListener("loadeddata", ready);
+        video.removeEventListener("waiting", resume);
+        video.removeEventListener("error", onVideoError);
+        instance.destroy();
+      };
+    }
 
     if (video.canPlayType("application/vnd.apple.mpegurl") || !src.includes(".m3u8")) {
       video.src = src;
       tryPlay();
-      return;
+      return () => {
+        video.removeEventListener("playing", ready);
+        video.removeEventListener("loadeddata", ready);
+        video.removeEventListener("waiting", resume);
+        video.removeEventListener("error", onVideoError);
+      };
     }
 
-    let cancelled = false;
-    let hls: { destroy: () => void } | undefined;
-
-    import("hls.js")
-      .then((module) => {
-        if (cancelled || !localRef.current) return;
-        const Hls = module.default;
-        if (!Hls.isSupported()) {
-          localRef.current.src = src;
-          tryPlay();
-          return;
-        }
-        const instance = new Hls();
-        instance.loadSource(src);
-        instance.attachMedia(localRef.current);
-        instance.on(Hls.Events.MANIFEST_PARSED, tryPlay);
-        hls = instance;
-      })
-      .catch(() => {
-        if (localRef.current) {
-          localRef.current.src = src;
-          tryPlay();
-        }
-      });
-
+    fail("This browser cannot play the live stream");
     return () => {
-      cancelled = true;
-      hls?.destroy();
+      video.removeEventListener("playing", ready);
+      video.removeEventListener("loadeddata", ready);
+      video.removeEventListener("waiting", resume);
+      video.removeEventListener("error", onVideoError);
     };
-  }, [src, autoPlay]);
+  }, [src, autoPlay, live]);
 
   return (
     <video
@@ -80,11 +128,12 @@ export function HlsPlayer({
         localRef.current = node;
         assignRef(ref, node);
       }}
-      poster={poster}
+      poster={live ? undefined : poster}
       controls={controls}
       autoPlay={autoPlay}
       muted={muted}
       playsInline
+      preload="auto"
       className={className ?? "h-full w-full object-cover"}
     />
   );

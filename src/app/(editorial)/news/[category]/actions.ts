@@ -1,9 +1,9 @@
 "use server";
 
-import { getWpPostsPage } from "@/lib/api/wordpress";
+import { getNewsPostsPage } from "@/lib/api/news";
 
-export async function loadMoreCategoryPosts(categoryId: number, page: number) {
-  if (!categoryId || page < 2) return { articles: [], hasMore: false };
-  const result = await getWpPostsPage({ categoryId, page, perPage: 10 });
-  return { articles: result.articles, hasMore: result.hasMore };
+export async function loadMoreCategoryPosts(categorySlug: string, cursor: string) {
+  if (!categorySlug || !cursor) return { articles: [], nextCursor: null, hasMore: false };
+  const result = await getNewsPostsPage({ categorySlug, cursor, perPage: 10 });
+  return { articles: result.articles, nextCursor: result.nextCursor, hasMore: result.hasMore };
 }

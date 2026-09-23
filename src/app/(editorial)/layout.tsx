@@ -1,6 +1,6 @@
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { getNewsNav } from "@/lib/api/wordpress";
+import { getNewsNav } from "@/lib/api/news";
 
 export default async function EditorialLayout({
   children,

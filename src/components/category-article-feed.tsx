@@ -39,37 +39,38 @@ function ArticleSkeleton() {
 
 export function CategoryArticleFeed({
   initialArticles,
-  categoryId,
+  categorySlug,
   excludeId,
+  initialCursor,
   hasMore: initialHasMore,
 }: {
   initialArticles: Article[];
-  categoryId: number;
+  categorySlug: string;
   excludeId?: string;
+  initialCursor?: string | null;
   hasMore: boolean;
 }) {
   const [articles, setArticles] = useState(initialArticles);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(initialHasMore && categoryId > 0);
+  const [cursor, setCursor] = useState(initialCursor ?? null);
+  const [hasMore, setHasMore] = useState(initialHasMore && Boolean(categorySlug));
   const [loading, setLoading] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
 
   const loadMore = useCallback(async () => {
-    if (!hasMore || loadingRef.current || categoryId <= 0) return;
+    if (!hasMore || loadingRef.current || !categorySlug || !cursor) return;
     loadingRef.current = true;
     setLoading(true);
-    const nextPage = page + 1;
-    const result = await loadMoreCategoryPosts(categoryId, nextPage);
+    const result = await loadMoreCategoryPosts(categorySlug, cursor);
     const seen = new Set(articles.map((item) => item.id));
     if (excludeId) seen.add(excludeId);
     const extra = result.articles.filter((item) => !seen.has(item.id));
     setArticles((current) => [...current, ...extra]);
-    setPage(nextPage);
+    setCursor(result.nextCursor);
     setHasMore(result.hasMore);
     setLoading(false);
     loadingRef.current = false;
-  }, [articles, categoryId, excludeId, hasMore, page]);
+  }, [articles, categorySlug, cursor, excludeId, hasMore]);
 
   useEffect(() => {
     const node = sentinelRef.current;
