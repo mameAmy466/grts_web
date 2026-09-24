@@ -31,6 +31,7 @@ export default async function LivePage() {
 
   return (
     <div className="bg-[#0A0A0A] pb-28">
+      <Suspense fallback={<div className="h-[70vh] animate-pulse bg-white/5" />}>
       <LiveDesk
         src={stream}
         channelId={channel?.id}
@@ -47,6 +48,7 @@ export default async function LivePage() {
           </Suspense>
         }
       />
+      </Suspense>
     </div>
   );
 }

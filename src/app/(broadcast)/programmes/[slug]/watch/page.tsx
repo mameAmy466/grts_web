@@ -43,11 +43,12 @@ export default async function ProgrammeReplayPage({
   const { e } = await searchParams;
   const program = (await getTveShow(slug)) ?? getProgramme(slug);
   const apiEpisodes = await getTveEpisodes(programEpisodeFeed(program), slug);
+  if (!program) notFound();
   const own = program.streamUrl ? programAsEpisode(program) : null;
   const episodes = own && !apiEpisodes.some((item) => item.id === own.id) ? [own, ...apiEpisodes] : apiEpisodes;
   const fallback = getReplay(slug);
   const current = episodes.find((item) => item.id === e) ?? episodes[0] ?? fallback;
-  if (!program || !current) notFound();
+  if (!current) notFound();
 
   const streamUrl =
     current.streamUrl || (current.streamFeedUrl ? await getVideoPlayback(current.streamFeedUrl) : "");
