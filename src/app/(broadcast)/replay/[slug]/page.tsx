@@ -37,18 +37,20 @@ export default async function ReplayTvPage({
 
   return (
     <div className="pb-20 pt-8">
-      <SiteWrap className="grid items-stretch gap-8 lg:grid-cols-12">
-        <div className="flex h-full min-h-0 flex-col lg:col-span-8">
-          <ReplayPlayer episode={episode} />
-        </div>
-        <div className="flex h-full min-h-0 flex-col lg:col-span-4">
-          <UpNextPanel episodes={others.slice(0, 7)} />
+      <SiteWrap>
+        <div className="grid w-full items-stretch gap-6 border-b border-[var(--color-text-disabled,#525252)] pb-8 md:grid-cols-12 md:gap-8">
+          <div className="flex h-full min-h-0 flex-col md:col-span-7 lg:col-span-8">
+            <ReplayPlayer episode={episode} />
+          </div>
+          <div className="flex max-h-[360px] min-h-0 flex-col md:col-span-5 md:max-h-none lg:col-span-4">
+            <UpNextPanel episodes={others.slice(0, 7)} />
+          </div>
         </div>
       </SiteWrap>
 
-      <SiteWrap className="mt-14">
+      <SiteWrap className="mt-10 md:mt-14">
         <div className="mb-5 flex items-end justify-between gap-4">
-          <h2 className="text-2xl font-bold text-white">Related Videos</h2>
+          <h2 className="text-xl font-bold text-white md:text-2xl">Related Videos</h2>
           <Link
             href="/programmes"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-400 hover:text-brand"
@@ -57,7 +59,7 @@ export default async function ReplayTvPage({
             <IconArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        <div className="grid justify-start gap-3 [grid-template-columns:repeat(auto-fill,263px)]">
+        <div className="grid grid-cols-2 justify-start gap-3 sm:grid-cols-[repeat(auto-fill,minmax(200px,263px))]">
           {others.slice(0, 8).map((item) => (
             <ReplayVideoCard key={item.id} episode={item} />
           ))}

@@ -101,7 +101,7 @@ export default async function NewsArticlePage({
 
   return (
     <div className="pb-16">
-      <div className="border-b border-zinc-200 bg-zinc-100">
+      <div className="bg-white">
         <SiteWrap className="py-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-500">
             <Link href="/news" className="hover:text-brand">
@@ -117,12 +117,12 @@ export default async function NewsArticlePage({
         </SiteWrap>
       </div>
 
-      <SiteWrap className="grid items-start gap-8 py-8 lg:grid-cols-12">
-        <article className="min-w-0 lg:col-span-8">
+      <SiteWrap className="grid items-start gap-8 py-8 md:grid-cols-12">
+        <article className="min-w-0 md:col-span-7 lg:col-span-8">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
             {article.categoryLabel}
           </p>
-          <h1 className="mt-2 text-3xl font-bold leading-tight text-zinc-900 md:text-4xl">
+          <h1 className="mt-2 text-2xl font-bold leading-tight text-zinc-900 sm:text-3xl md:text-4xl">
             {article.title}
           </h1>
           <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-zinc-500">

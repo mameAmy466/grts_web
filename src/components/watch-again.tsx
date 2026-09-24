@@ -62,30 +62,30 @@ export function WatchAgain({ videos }: { videos: VideoItem[] }) {
     <section>
       <SectionHeading title="Watch Again" href="/programmes" />
 
-      <div className="grid items-stretch gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(280px,0.85fr)]">
+      <div className="grid items-stretch gap-6 md:grid-cols-[minmax(0,1.45fr)_minmax(240px,0.85fr)]">
         <Link
           href={featured.href}
-          className="group relative block h-full min-h-[364px] rounded-2xl bg-[#1a1a1a]"
+          className="group relative block h-full min-h-[240px] rounded-2xl bg-[#1a1a1a] sm:min-h-[300px] md:min-h-[364px]"
         >
           <div className="absolute inset-0 overflow-hidden rounded-2xl">
             <MediaImage src={featured.image} alt={featured.title} />
           </div>
           <div className="featured-card-glass absolute inset-x-0 bottom-0 z-10 flex items-center text-white backdrop-blur-[18px]">
-            <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-white/20 bg-[#00000066] text-white backdrop-blur-[18px] transition group-hover:scale-105">
-              <IconPlay className="ml-1 h-7 w-7" />
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/20 bg-[#00000066] text-white backdrop-blur-[18px] transition group-hover:scale-105 md:h-16 md:w-16">
+              <IconPlay className="ml-0.5 h-5 w-5 md:ml-1 md:h-7 md:w-7" />
             </span>
-            <div className="flex min-w-0 flex-col items-start gap-1.5">
+            <div className="flex min-w-0 flex-col items-start gap-1 md:gap-1.5">
               <CategoryPill label={featured.category} />
-              <h3 className="line-clamp-2 text-2xl font-semibold leading-snug md:text-[28px]">
+              <h3 className="line-clamp-2 text-base font-semibold leading-snug sm:text-xl md:text-[28px]">
                 {featured.title}
               </h3>
-              <p className="text-sm text-white/70">{videoMeta(featured)}</p>
+              <p className="line-clamp-1 text-xs text-white/70 sm:text-sm">{videoMeta(featured)}</p>
             </div>
           </div>
         </Link>
 
         {latest.length ? (
-          <div className="flex h-full flex-col rounded-[20px] bg-[#1a1a1a] p-5 ring-1 ring-white/8 md:p-6">
+          <div className="flex h-full flex-col rounded-[20px] bg-[#1a1a1a] p-4 ring-1 ring-white/8 sm:p-5 md:p-6">
             <h3 className="text-xl font-semibold text-white">Latest videos</h3>
             <div className="mt-5 flex flex-1 flex-col justify-between gap-4">
               {latest.map((video) => (

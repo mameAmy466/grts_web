@@ -47,6 +47,7 @@ function isActive(pathname: string, href: string) {
 }
 
 export function SiteHeader({
+  theme = "dark",
   newsCategories = [],
 }: {
   theme?: ChromeTheme;
@@ -56,6 +57,7 @@ export function SiteHeader({
   const [open, setOpen] = useState(false);
   const [newsOpen, setNewsOpen] = useState(false);
   const [mobileNewsOpen, setMobileNewsOpen] = useState(false);
+  const light = theme === "light";
 
   useEffect(() => {
     if (!open) return;
@@ -67,9 +69,23 @@ export function SiteHeader({
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--color-bg-primary,#0A0A0A)] bg-[#171717] text-white">
-      <div className="hidden border-b border-[var(--color-bg-primary,#0A0A0A)] bg-[var(--color-bg-primary,#0A0A0A)] text-[12px] text-zinc-400 sm:block">
-        <div className="mx-auto flex h-12 w-full max-w-[1514px] items-center justify-between px-6 sm:px-8 xl:px-32">
+    <header
+      className={cn(
+        "sticky top-0 z-40",
+        light
+          ? "bg-[var(--color-bg-tertiary,#F5F5F5)] text-zinc-800"
+          : "border-b border-[var(--color-bg-primary,#0A0A0A)] bg-[#171717] text-white",
+      )}
+    >
+      <div
+        className={cn(
+          "hidden text-[12px] sm:block",
+          light
+            ? "bg-white text-zinc-500"
+            : "border-b border-[var(--color-bg-primary,#0A0A0A)] bg-[var(--color-bg-primary,#0A0A0A)] text-zinc-400",
+        )}
+      >
+        <div className="mx-auto flex h-12 w-full max-w-[1514px] items-center justify-between px-4 sm:px-8 xl:px-32">
           <div className="flex items-center gap-4">
             <a href={`tel:${SITE.phone.replace(/\s/g, "")}`} className="inline-flex items-center gap-1.5 hover:text-brand">
               <IconPhone className="h-3.5 w-3.5" />
@@ -91,8 +107,8 @@ export function SiteHeader({
                   rel="noreferrer"
                   aria-label={item.name}
                   className={cn(
-                    "flex h-6 w-6 items-center justify-center rounded-full",
-                    "bg-white/10 hover:bg-brand hover:text-white",
+                    "flex h-6 w-6 items-center justify-center rounded-full hover:bg-brand hover:text-white",
+                    light ? "bg-zinc-200 text-zinc-600" : "bg-white/10",
                   )}
                 >
                   <Icon className="h-3 w-3" />
@@ -103,8 +119,8 @@ export function SiteHeader({
         </div>
       </div>
 
-      <div className="mx-auto flex h-[68px] w-full max-w-[1514px] items-center px-6 sm:px-8 xl:px-32">
-        <Logo className="text-white" />
+      <div className="mx-auto flex h-[68px] w-full max-w-[1514px] items-center px-4 sm:px-8 xl:px-32">
+        <Logo className={light ? "text-zinc-900" : "text-white"} />
 
         <nav className="hidden items-center gap-7 text-[15px] font-medium lg:ml-16 lg:flex xl:ml-[265px]">
           {nav.map((item) =>
@@ -119,8 +135,11 @@ export function SiteHeader({
                   href={item.href}
                   className={cn(
                     "inline-flex items-center gap-1 py-5",
-                    isActive(pathname, item.href) ? "text-brand" : "hover:text-white",
-                    isActive(pathname, item.href) && "shadow-[inset_0_-2px_0_0_var(--color-brand)]",
+                    isActive(pathname, item.href)
+                      ? "text-brand shadow-[inset_0_-2px_0_0_var(--color-brand)]"
+                      : light
+                        ? "hover:text-zinc-950"
+                        : "hover:text-white",
                   )}
                 >
                   {item.label}
@@ -130,14 +149,19 @@ export function SiteHeader({
                   <div
                     className={cn(
                       "absolute left-1/2 top-full z-50 w-52 -translate-x-1/2 rounded-lg border py-2 shadow-xl",
-                      "border-white/10 bg-[#171717]",
+                      light
+                        ? "border-zinc-200 bg-[var(--color-bg-tertiary,#F5F5F5)]"
+                        : "border-white/10 bg-[#171717]",
                     )}
                   >
                     {newsCategories.map((category) => (
                       <Link
                         key={category.slug}
                         href={`/news/${category.slug}`}
-                        className="block px-4 py-2 text-sm hover:text-brand"
+                        className={cn(
+                          "block px-4 py-2 text-sm hover:text-brand",
+                          light ? "text-zinc-700" : "",
+                        )}
                       >
                         {category.label}
                       </Link>
@@ -151,8 +175,11 @@ export function SiteHeader({
                 href={item.href}
                 className={cn(
                   "py-5",
-                  isActive(pathname, item.href) ? "text-brand" : "hover:text-white",
-                  isActive(pathname, item.href) && "shadow-[inset_0_-2px_0_0_var(--color-brand)]",
+                  isActive(pathname, item.href)
+                    ? "text-brand shadow-[inset_0_-2px_0_0_var(--color-brand)]"
+                    : light
+                      ? "hover:text-zinc-950"
+                      : "hover:text-white",
                 )}
               >
                 {item.label}
@@ -166,13 +193,19 @@ export function SiteHeader({
             <button
               type="button"
               aria-label="Search"
-              className="flex h-6 w-5 shrink-0 items-center justify-center text-white hover:text-brand"
+              className={cn(
+                "flex h-6 w-5 shrink-0 items-center justify-center hover:text-brand",
+                light ? "text-zinc-800" : "text-white",
+              )}
             >
               <IconSearch className="h-5 w-5" />
             </button>
             <button
               type="button"
-              className="inline-flex h-6 w-[41px] shrink-0 items-center justify-center rounded-[4px] border border-white/20 px-3 py-1.5 text-[11px] font-semibold leading-none text-white hover:border-brand hover:text-brand"
+              className={cn(
+                "inline-flex h-6 w-[41px] shrink-0 items-center justify-center rounded-[4px] border px-3 py-1.5 text-[11px] font-semibold leading-none hover:border-brand hover:text-brand",
+                light ? "border-zinc-300 text-zinc-800" : "border-white/20 text-white",
+              )}
             >
               EN
             </button>
@@ -200,13 +233,18 @@ export function SiteHeader({
           <nav
             className={cn(
               "absolute inset-x-0 top-full z-40 max-h-[calc(100dvh-var(--site-header))] overflow-y-auto border-t",
-              "border-white/10 bg-[#171717]",
+              light
+                ? "border-zinc-200 bg-[var(--color-bg-tertiary,#F5F5F5)]"
+                : "border-white/10 bg-[#171717]",
             )}
           >
             <div className="px-4 py-2">
               {mobileNav.map((item) =>
                 item.children ? (
-                  <div key={item.href} className="border-b border-white/10">
+                  <div
+                    key={item.href}
+                    className={cn("border-b", light ? "border-zinc-200" : "border-white/10")}
+                  >
                     <div className="flex items-center">
                       <Link
                         href={item.href}
@@ -229,13 +267,18 @@ export function SiteHeader({
                       </button>
                     </div>
                     {mobileNewsOpen ? (
-                      <div className="mb-3 ml-1 grid grid-cols-2 gap-1 border-l border-white/10 pl-3">
+                      <div
+                        className={cn(
+                          "mb-3 ml-1 grid grid-cols-2 gap-1 border-l pl-3",
+                          light ? "border-zinc-200" : "border-white/10",
+                        )}
+                      >
                         <Link
                           href="/news"
                           onClick={() => setOpen(false)}
                           className={cn(
                             "col-span-2 rounded-md px-2 py-2 text-sm",
-                            pathname === "/news" ? "text-brand" : "text-zinc-400",
+                            pathname === "/news" ? "text-brand" : light ? "text-zinc-500" : "text-zinc-400",
                           )}
                         >
                           All news
@@ -249,7 +292,9 @@ export function SiteHeader({
                               "rounded-md px-2 py-2 text-sm",
                               pathname.startsWith(`/news/${category.slug}`)
                                 ? "text-brand"
-                                : "text-zinc-400",
+                                : light
+                                  ? "text-zinc-500"
+                                  : "text-zinc-400",
                             )}
                           >
                             {category.label}
@@ -265,7 +310,7 @@ export function SiteHeader({
                     onClick={() => setOpen(false)}
                     className={cn(
                       "block border-b py-3.5 text-[16px] font-semibold",
-                      "border-white/10",
+                      light ? "border-zinc-200" : "border-white/10",
                       isActive(pathname, item.href) ? "text-brand" : "",
                     )}
                   >
@@ -275,7 +320,7 @@ export function SiteHeader({
               )}
             </div>
 
-            <div className="mt-2 bg-black/20 px-4 pb-6 pt-3">
+            <div className={cn("mt-2 px-4 pb-6 pt-3", light ? "bg-zinc-50" : "bg-black/20")}>
               <div className="mb-4 flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
                   Language
@@ -284,7 +329,7 @@ export function SiteHeader({
                   EN
                 </span>
               </div>
-              <div className="flex flex-col gap-2 text-sm text-zinc-400">
+              <div className={cn("flex flex-col gap-2 text-sm", light ? "text-zinc-600" : "text-zinc-400")}>
                 <a href={`tel:${SITE.phone.replace(/\s/g, "")}`} className="inline-flex items-center gap-2 hover:text-brand">
                   <IconPhone className="h-4 w-4" />
                   {SITE.phone}
@@ -305,8 +350,8 @@ export function SiteHeader({
                       rel="noreferrer"
                       aria-label={item.name}
                       className={cn(
-                        "flex h-9 w-9 items-center justify-center rounded-full",
-                        "bg-white/10 hover:bg-brand hover:text-white",
+                        "flex h-9 w-9 items-center justify-center rounded-full hover:bg-brand hover:text-white",
+                        light ? "bg-zinc-200 text-zinc-600" : "bg-white/10",
                       )}
                     >
                       <Icon className="h-3.5 w-3.5" />

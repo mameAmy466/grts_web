@@ -75,8 +75,8 @@ export function ReplayPlayer({ episode }: { episode: ReplayEpisode }) {
               onClick={() => setPlaying((value) => !value)}
               className="absolute inset-0 flex items-center justify-center"
             >
-              <span className="btn-glass-dark flex h-16 w-16 items-center justify-center rounded-full text-white">
-                <IconPlay className="ml-1 h-7 w-7" />
+              <span className="btn-glass-dark flex h-12 w-12 items-center justify-center rounded-full text-white md:h-16 md:w-16">
+                <IconPlay className="ml-1 h-5 w-5 md:h-7 md:w-7" />
               </span>
             </button>
           )}
@@ -86,7 +86,7 @@ export function ReplayPlayer({ episode }: { episode: ReplayEpisode }) {
             <div className="h-1 overflow-hidden rounded-full bg-white/25">
               <div className="h-full rounded-full bg-white" style={{ width: `${progress}%` }} />
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-3">
               <button
                 type="button"
                 aria-label={playing ? "Pause" : "Play"}
@@ -94,8 +94,8 @@ export function ReplayPlayer({ episode }: { episode: ReplayEpisode }) {
               >
                 {playing ? <IconPause className="h-5 w-5" /> : <IconPlay className="h-5 w-5" />}
               </button>
-              <IconVolume className="h-5 w-5" />
-              <span className="h-1 w-16 overflow-hidden rounded-full bg-white/20">
+              <IconVolume className="hidden h-5 w-5 sm:block" />
+              <span className="hidden h-1 w-16 overflow-hidden rounded-full bg-white/20 sm:block">
                 <span className="block h-full w-2/3 bg-white" />
               </span>
               <span className="text-[11px] tabular-nums text-zinc-200">
@@ -114,14 +114,14 @@ export function ReplayPlayer({ episode }: { episode: ReplayEpisode }) {
           </span>
           <span className="text-xs text-zinc-400">{formatDisplayDate(episode.published)}</span>
         </div>
-        <div className="mt-3 flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold leading-tight text-white md:text-3xl">{episode.title}</h1>
+        <div className="mt-3 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold leading-tight text-white sm:text-2xl md:text-3xl">{episode.title}</h1>
             <p className="mt-2 text-sm text-zinc-400">{episode.views}</p>
           </div>
           <button
             type="button"
-            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/15 bg-[#1a1a1a] px-4 py-2 text-sm font-medium text-white hover:border-white/30"
+            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/15 bg-[#1a1a1a] px-3 py-2 text-sm font-medium text-white hover:border-white/30 sm:px-4"
           >
             <IconShare className="h-4 w-4" />
             Share

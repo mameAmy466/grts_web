@@ -17,7 +17,7 @@ export async function NewsSidebar({
   const picks = choice.length ? choice.slice(0, 3) : editorsChoiceSidebar.slice(0, 3);
   const list = topics?.length ? topics : categories.filter((item) => item.slug !== "culture");
   return (
-    <aside className="lg:sticky lg:top-[calc(var(--site-header)+1rem)] lg:col-span-4 lg:self-start">
+    <aside className="min-w-0 md:col-span-5 md:self-start lg:sticky lg:top-[calc(var(--site-header)+1rem)] lg:col-span-4">
       <h2 className="text-lg font-bold text-zinc-900">Explore Topics</h2>
       <ul className="mt-4 divide-y divide-zinc-200 border-y border-zinc-200">
         {list.map((item) => (

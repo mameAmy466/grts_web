@@ -45,19 +45,19 @@ export default async function NewsPage() {
     <div className="bg-white pb-16">
       <BreakingTicker articles={ticker.slice(0, 6)} />
 
-      <SiteWrap className="py-10">
-        <div className="grid gap-5 lg:grid-cols-12">
-          <div className="lg:col-span-7">
+      <SiteWrap className="py-8 sm:py-10">
+        <div className="grid min-w-0 gap-5 md:grid-cols-12">
+          <div className="min-w-0 md:col-span-7">
             <Link href={featured.href} className="group relative block overflow-hidden rounded-xl">
-              <div className="relative aspect-[16/10] min-h-[340px] bg-zinc-200">
+              <div className="relative aspect-[16/10] min-h-[220px] bg-zinc-200 sm:min-h-[340px]">
                 <MediaImage
                   src={featured.image}
                   alt={featured.title}
                   priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
-                  <h1 className="line-clamp-3 break-words text-2xl font-bold leading-tight text-white md:text-4xl">
+                <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 md:p-8">
+                  <h1 className="line-clamp-3 break-words text-xl font-bold leading-tight text-white sm:text-2xl md:text-4xl">
                     {clipText(featured.title, 110)}
                   </h1>
                   <p className="mt-2 line-clamp-3 break-words text-sm text-zinc-200">
@@ -83,7 +83,7 @@ export default async function NewsPage() {
               ))}
             </div>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:col-span-5">
+          <div className="grid min-w-0 gap-5 sm:grid-cols-2 md:col-span-5">
             {grid.map((article) => (
               <NewsGridCard key={article.id} article={article} theme="light" />
             ))}
@@ -144,7 +144,7 @@ export default async function NewsPage() {
           <aside className="flex w-full flex-col gap-8 lg:w-[432px] lg:shrink-0">
             <div>
               <h3 className="text-sm font-bold text-zinc-900">Follow Us</h3>
-              <div className="mt-3 flex h-[55px] w-full max-w-[432px] gap-1">
+              <div className="mt-3 flex h-auto w-full max-w-[432px] flex-wrap gap-1 sm:h-[55px] sm:flex-nowrap">
                 {followerStats.map((item, index) => {
                   const Icon = socialIcons[item.name];
                   return (
@@ -153,7 +153,7 @@ export default async function NewsPage() {
                       href={socialLinks[index].href}
                       target="_blank"
                       rel="noreferrer"
-                      className="btn-glass flex h-[55px] w-[105px] shrink-0 items-center gap-2.5 rounded-md p-3"
+                      className="btn-glass flex h-[55px] min-w-0 flex-1 items-center gap-2 rounded-md p-2 sm:w-[105px] sm:flex-none sm:gap-2.5 sm:p-3"
                     >
                       <Icon className="h-4 w-4 shrink-0" style={{ color: item.color }} />
                       <span className="min-w-0">

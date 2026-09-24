@@ -320,7 +320,7 @@ export function StickyRadioBar() {
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[#111]/95 backdrop-blur">
-      <div className="mx-auto flex h-16 w-full max-w-[1514px] items-center gap-3 px-6 sm:px-8 xl:px-32">
+      <div className="mx-auto flex h-16 w-full max-w-[1514px] items-center gap-3 px-4 sm:px-8 xl:px-32">
         <button
           type="button"
           aria-label={playing ? "Pause radio" : "Play radio"}

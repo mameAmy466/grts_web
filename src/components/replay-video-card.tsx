@@ -10,7 +10,7 @@ function episodeHref(episode: ReplayEpisode) {
 
 export function ReplayVideoCard({ episode }: { episode: ReplayEpisode }) {
   return (
-    <Link href={episodeHref(episode)} className="group flex h-[251px] w-[263px] flex-col gap-3">
+    <Link href={episodeHref(episode)} className="group flex h-auto w-full max-w-[263px] flex-col gap-3 sm:h-[251px]">
       <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-zinc-800">
         <MediaImage
           src={episode.image}

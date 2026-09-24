@@ -46,8 +46,8 @@ export default async function NewsCategoryPage({
 
   return (
     <div className="pb-16">
-      <SiteWrap className="grid gap-10 py-8 lg:grid-cols-12">
-        <div className="lg:col-span-8">
+      <SiteWrap className="grid gap-8 py-8 md:grid-cols-12 md:gap-10">
+        <div className="min-w-0 md:col-span-7 lg:col-span-8">
           <Link href={featured.href} className="group grid gap-6 md:grid-cols-2">
             <div className="relative aspect-[16/11] overflow-hidden rounded-xl bg-zinc-200">
               <MediaImage

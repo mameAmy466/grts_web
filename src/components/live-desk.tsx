@@ -70,44 +70,46 @@ export function LiveDesk({
   return (
     <LiveVideosContext.Provider value={setVideos}>
       <SiteWrap className="py-8">
-        <div className="grid items-start gap-6 lg:grid-cols-12">
-          <div className="lg:col-span-8">
-            <LiveVideoPlayer
-              src={replay ? replaySrc : stream}
-              youtubeSrc={youtubeSrc || undefined}
-              poster={replay?.image}
-              title={replay ? replay.title : liveTitle}
-              replay={Boolean(replay)}
-              loading={!replay && loadingStream}
-              onLive={goLive}
-            />
-            <LiveNowCopy
-              title={replay ? replay.title : "Live Now"}
-              description={replay ? undefined : liveDescription}
-              live={!replay}
-            />
-            {replay ? (
-              <div className="mt-4">
-                <button
-                  type="button"
-                  onClick={goLive}
-                  className="inline-flex items-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-hover"
-                >
-                  <span className="h-2 w-2 rounded-full bg-white" />
-                  Back to live
-                </button>
-              </div>
-            ) : null}
-            <LiveRadioCard />
+        <div className="w-full border-b border-[var(--color-text-disabled,#525252)] pb-8">
+          <div className="grid items-start gap-6 md:grid-cols-12">
+            <div className="md:col-span-7 lg:col-span-8">
+              <LiveVideoPlayer
+                src={replay ? replaySrc : stream}
+                youtubeSrc={youtubeSrc || undefined}
+                poster={replay?.image}
+                title={replay ? replay.title : liveTitle}
+                replay={Boolean(replay)}
+                loading={!replay && loadingStream}
+                onLive={goLive}
+              />
+              <LiveNowCopy
+                title={replay ? replay.title : "Live Now"}
+                description={replay ? undefined : liveDescription}
+                live={!replay}
+              />
+              {replay ? (
+                <div className="mt-4">
+                  <button
+                    type="button"
+                    onClick={goLive}
+                    className="inline-flex items-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-hover"
+                  >
+                    <span className="h-2 w-2 rounded-full bg-white" />
+                    Back to live
+                  </button>
+                </div>
+              ) : null}
+              <LiveRadioCard />
+            </div>
+            <div className="md:col-span-5 lg:col-span-4">{guide}</div>
           </div>
-          <div className="lg:col-span-4">{guide}</div>
         </div>
       </SiteWrap>
 
       {latest}
 
       {videos.length ? (
-        <SiteWrap className="border-t border-white/10 pt-8">
+        <SiteWrap className="pt-8">
           <SectionHeading title="Latest videos" href="/programmes" />
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {videos.map((video) => (

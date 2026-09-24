@@ -57,8 +57,9 @@ export default async function ProgrammeDetailPage({
     <div className="pb-20">
       <section>
         <SiteWrap className="pt-10">
-          <div className="flex h-auto w-full max-w-[1143px] flex-col items-start gap-10 opacity-100 sm:flex-row sm:items-center lg:h-[335px]">
-            <div className="relative h-[335px] w-[251px] shrink-0 overflow-hidden rounded-xl border border-white/10 bg-zinc-800">
+          <div className="w-full border-b border-[var(--color-text-disabled,#525252)] pb-10">
+          <div className="flex h-auto w-full max-w-[1143px] flex-col items-start gap-6 opacity-100 sm:flex-row sm:items-center sm:gap-8 lg:h-[335px] lg:gap-10">
+            <div className="relative mx-auto h-[260px] w-[195px] shrink-0 overflow-hidden rounded-xl border border-white/10 bg-zinc-800 sm:mx-0 sm:h-[300px] sm:w-[225px] lg:h-[335px] lg:w-[251px]">
               <MediaImage
                 src={program.poster ?? program.image}
                 alt={program.title}
@@ -78,7 +79,7 @@ export default async function ProgrammeDetailPage({
               >
                 {program.badge}
               </span>
-              <h1 className="mt-4 text-4xl font-bold uppercase tracking-tight text-white md:text-5xl">
+              <h1 className="mt-3 text-3xl font-bold uppercase tracking-tight text-white sm:mt-4 sm:text-4xl md:text-5xl">
                 {program.title}
               </h1>
               <p className="mt-2 text-sm font-medium text-zinc-300">
@@ -93,6 +94,7 @@ export default async function ProgrammeDetailPage({
                 Watch now
               </Link>
             </div>
+          </div>
           </div>
         </SiteWrap>
       </section>
@@ -110,7 +112,7 @@ export default async function ProgrammeDetailPage({
 
       <SiteWrap>
         <SectionHeading title="More programmes" href="/programmes" />
-        <div className="grid justify-start gap-4 [grid-template-columns:repeat(auto-fill,209px)]">
+        <div className="grid grid-cols-2 justify-start gap-3 sm:grid-cols-[repeat(auto-fill,minmax(160px,209px))] sm:gap-4">
           {related.map((item) => (
             <ProgramCard key={item.id} program={item} />
           ))}

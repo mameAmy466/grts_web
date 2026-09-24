@@ -121,7 +121,7 @@ export function ProgrammesCatalog({
             No programme matches that search.
           </p>
         ) : (
-          <div className="mt-8 grid justify-center gap-4 [grid-template-columns:repeat(auto-fill,209px)] sm:justify-start">
+          <div className="mt-8 grid grid-cols-2 justify-center gap-3 sm:grid-cols-[repeat(auto-fill,minmax(160px,209px))] sm:justify-start sm:gap-4">
             {visible.map((program) => (
               <ProgramCard key={`${program.slug}-${program.filter}`} program={program} />
             ))}

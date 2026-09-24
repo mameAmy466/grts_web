@@ -46,15 +46,15 @@ export function VideoCard({
   compact?: boolean;
 }) {
   const cardClassName = cn(
-    "group flex h-[233px] w-full max-w-[267px] flex-col gap-2.5 overflow-hidden rounded-lg text-left",
-    selected && "ring-2 ring-brand",
+    "group flex h-auto w-full max-w-[267px] flex-col gap-2.5 rounded-lg border border-transparent text-left sm:h-[233px]",
+    selected && "rounded-xl border-white/10 bg-[#141414] p-4",
     className,
   );
   const date = formatDisplayDate(video.posted);
   const description = video.description?.trim();
   const content = (
     <>
-      <div className="relative h-[150px] w-full shrink-0 overflow-hidden rounded-lg bg-zinc-800">
+      <div className="relative h-[150px] w-full shrink-0 overflow-hidden rounded-[8px] bg-zinc-800">
         <MediaImage
           src={video.image}
           alt={video.title}
@@ -222,18 +222,18 @@ export function NewsOverlayCard({
 }) {
   return (
     <Link href={article.href} className={cn("group relative block h-full overflow-hidden rounded-xl", className)}>
-      <div className={cn("relative h-full bg-zinc-800", large ? "aspect-[16/10] min-h-[360px] md:min-h-[420px]" : "aspect-[16/10]")}>
+      <div className={cn("relative h-full min-w-0 bg-zinc-800", large ? "aspect-[16/10] min-h-[220px] sm:min-h-[360px] md:min-h-[420px]" : "aspect-[16/10]")}>
         <MediaImage
           src={article.image}
           alt={article.title}
           priority={large}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 p-5 md:p-7">
+        <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 md:p-7">
           <span className="inline-block rounded bg-brand px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
             {article.categoryLabel}
           </span>
-          <h3 className={cn("mt-2 line-clamp-3 break-words font-bold leading-tight text-white", large ? "text-2xl md:text-3xl" : "text-lg")}>
+          <h3 className={cn("mt-2 line-clamp-3 break-words font-bold leading-tight text-white", large ? "text-xl sm:text-2xl md:text-3xl" : "text-lg")}>
             {clipText(article.title, large ? 110 : 90)}
           </h3>
           <p className="mt-2 text-xs text-zinc-300">{formatDisplayDate(article.date)}</p>

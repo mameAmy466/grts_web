@@ -36,35 +36,35 @@ export default async function HomePage() {
 
   return (
     <div className="pb-20">
-      <SiteWrap className="py-10">
+      <SiteWrap className="py-8 sm:py-10">
         <SectionHeading title="News" href="/news" />
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
           {topNews.map((article) => (
             <NewsThumbRow key={article.id} article={article} />
           ))}
         </div>
       </SiteWrap>
 
-      <SiteWrap className="pb-12">
-        <div className="grid items-stretch gap-3 lg:grid-cols-12">
-          <div className="lg:col-span-7">
+      <SiteWrap className="pb-10 sm:pb-12">
+        <div className="grid min-w-0 items-stretch gap-4 md:grid-cols-12 md:gap-3">
+          <div className="min-w-0 md:col-span-7">
             <NewsOverlayCard article={featured} large />
           </div>
-          <div className="flex flex-col gap-3 lg:col-span-5 lg:h-full">
+          <div className="flex min-w-0 flex-col gap-3 md:col-span-5 md:h-full">
             {side.map((article) => (
               <SideNewsRow key={article.id} article={article} className="min-h-0 flex-1" />
             ))}
           </div>
         </div>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid gap-5 sm:mt-8 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
           {grid.map((article) => (
             <NewsGridCard key={article.id} article={article} />
           ))}
         </div>
       </SiteWrap>
 
-      <SiteWrap className="pb-12">
-        <div className="flex h-auto w-full flex-col justify-between gap-5 rounded-3xl border-x-0 border-y border-[var(--color-bg-primary,#0A0A0A)] bg-[var(--color-surface-default,#171717)] px-10 py-6 sm:h-[140px] sm:flex-row sm:items-center sm:gap-8 sm:py-0">
+      <SiteWrap className="pb-10 sm:pb-12">
+        <div className="flex h-auto w-full flex-col justify-between gap-5 rounded-3xl border-x-0 border-y border-[var(--color-bg-primary,#0A0A0A)] bg-[var(--color-surface-default,#171717)] px-4 py-6 sm:h-[140px] sm:flex-row sm:items-center sm:gap-8 sm:px-10 sm:py-0">
           <div className="min-w-0">
             <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-brand">YOUR AD HERE</p>
             <p className="mt-1 text-xl font-bold leading-tight text-zinc-200">Promote your brand on GRTS</p>
@@ -83,7 +83,7 @@ export default async function HomePage() {
       </SiteWrap>
 
       {replayVideos.length ? (
-        <section className="bg-[#111] py-12">
+        <section className="bg-[#111] py-8 md:py-12">
           <SiteWrap>
             <WatchAgain videos={replayVideos} />
           </SiteWrap>
@@ -100,7 +100,7 @@ export default async function HomePage() {
       {popularVideos.length ? (
         <SiteWrap>
           <SectionHeading title="Most popular videos" href="/programmes" />
-          <div className="grid grid-cols-[repeat(auto-fill,267px)] justify-start gap-2">
+          <div className="grid grid-cols-2 justify-start gap-3 sm:grid-cols-[repeat(auto-fill,minmax(200px,267px))] sm:gap-2">
             {popularVideos.map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}

@@ -5,8 +5,8 @@ import type { Program } from "@/lib/types";
 
 export function ProgramCard({ program }: { program: Program }) {
   return (
-    <Link href={`/programmes/${program.slug}`} className="group block w-[209px]">
-      <article className="relative h-[285px] w-[209px] rotate-0 overflow-hidden rounded-[12px] border border-white/15 bg-zinc-800 opacity-100">
+    <Link href={`/programmes/${program.slug}`} className="group block w-full max-w-[209px]">
+      <article className="relative aspect-[209/285] w-full overflow-hidden rounded-[12px] border border-white/15 bg-zinc-800">
         <MediaImage
           src={program.image}
           alt={program.title}
@@ -21,7 +21,7 @@ export function ProgramCard({ program }: { program: Program }) {
         </span>
         <Duration value={program.duration || ""} className="top-3 right-3 bottom-auto" />
         <div className="absolute inset-x-0 bottom-0 p-3">
-          <h3 className="text-base font-bold leading-snug text-white group-hover:text-brand">
+          <h3 className="text-sm font-bold leading-snug text-white group-hover:text-brand sm:text-base">
             {program.title}
           </h3>
           <p className="mt-1 text-[11px] text-zinc-300">{program.schedule}</p>
