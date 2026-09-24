@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { allItems, getJson, getJsonUncached } from "@/lib/api/http";
 import { TVE_API_BASE, TVE_APP_DETAILS_URL, TVE_APP_SLUG } from "@/lib/env";
+import { REVALIDATE_CATEGORY, REVALIDATE_STATIC } from "@/lib/revalidate";
 import type { CatalogFilter, Program, ProgramSlot, RadioStation, ReplayEpisode, ShortItem, VideoItem } from "@/lib/types";
 import {
   colorFromLabel,
@@ -210,7 +211,7 @@ function appJson(...parts: Array<string | number>) {
 
 export async function getTveAppDetails() {
   try {
-    const data = await getJson<TveAppDetails>(TVE_APP_DETAILS_URL);
+    const data = await getJson<TveAppDetails>(TVE_APP_DETAILS_URL, REVALIDATE_STATIC);
     return data.ACAN_API?.[0] ?? null;
   } catch {
     return null;
@@ -219,7 +220,7 @@ export async function getTveAppDetails() {
 
 export async function getLiveTvChannels() {
   try {
-    return allItems<TveLiveTv>(await getJson(appJson("listLiveTV")));
+    return allItems<TveLiveTv>(await getJson(appJson("listLiveTV"), REVALIDATE_CATEGORY));
   } catch {
     return [];
   }
@@ -227,7 +228,7 @@ export async function getLiveTvChannels() {
 
 export async function getLiveRadios() {
   try {
-    return allItems<TveRadio>(await getJson(appJson("listLiveRadios")));
+    return allItems<TveRadio>(await getJson(appJson("listLiveRadios"), REVALIDATE_STATIC));
   } catch {
     return [];
   }
@@ -242,29 +243,6 @@ export async function getLiveRadioStation(): Promise<RadioStation | null> {
     streamUrl: radio.stream_url || "",
     image: radio.hd_logo || radio.sd_logo || "",
   };
-}
-
-export async function getLivePlayback(channelId: string) {
-  try {
-    const data = await getJsonUncached<{ web_url?: string; direct_url?: string }>(
-      tveUrl("directplayback", channelId, "json"),
-    );
-    return data?.direct_url || data?.web_url || "";
-  } catch {
-    return "";
-  }
-}
-
-export async function getVideoPlayback(feedUrl: string) {
-  try {
-    const data = await getJson<unknown>(feedUrl, 30);
-    const item = (Array.isArray(data) ? data[0] : data) as
-      | { web_url?: string; video_url?: string; direct_url?: string }
-      | undefined;
-    return item?.web_url || item?.video_url || item?.direct_url || "";
-  } catch {
-    return "";
-  }
 }
 
 export function programEpisodeFeed(program?: Pick<Program, "videoFeedUrl" | "feedUrl"> | null) {
@@ -291,7 +269,7 @@ export function programAsEpisode(program: Program): ReplayEpisode {
 }
 
 async function getAndroidItem(title: string) {
-  const items = allItems<TveAndroidItem>(await getJson(appJson("listAndroid")));
+  const items = allItems<TveAndroidItem>(await getJson(appJson("listAndroid"), REVALIDATE_STATIC));
   const needle = title.trim().toLowerCase();
   return items.find((item) => item.title.trim().toLowerCase() === needle) ?? null;
 }
@@ -315,7 +293,7 @@ async function getCategoriesWithVideoUrl() {
   try {
     const menu = await getAndroidItem("CATEGORIES VOD");
     if (menu?.feed_url) {
-      const groups = allItems<TveCategoryGroup>(await getJson(menu.feed_url));
+      const groups = allItems<TveCategoryGroup>(await getJson(menu.feed_url, REVALIDATE_STATIC));
       const url = groups[0]?.categories_with_video_by_group;
       if (url) return url;
     }
@@ -412,7 +390,7 @@ export async function getTveProgramCatalog(): Promise<{
 }> {
   try {
     return await unstable_cache(loadProgramCatalog, ["tve-program-catalog-duration", TVE_APP_SLUG], {
-      revalidate: 120,
+      revalidate: REVALIDATE_STATIC,
     })();
   } catch {
     return { categories: [], programmes: [] };
@@ -432,7 +410,7 @@ export async function getTveShow(slug: string) {
 export async function getTveEpisodes(feedUrl?: string, programSlug = ""): Promise<ReplayEpisode[]> {
   if (!feedUrl) return [];
   try {
-    const videos = await withYoutubeDurations(allItems<TveVideo>(await getJson(feedUrl)));
+    const videos = await withYoutubeDurations(allItems<TveVideo>(await getJson(feedUrl, REVALIDATE_STATIC)));
     return videos.map((item) => videoToReplay(item, programSlug));
   } catch {
     return [];
@@ -441,7 +419,7 @@ export async function getTveEpisodes(feedUrl?: string, programSlug = ""): Promis
 
 export async function getTveSliders(): Promise<VideoItem[]> {
   try {
-    const videos = await withYoutubeDurations(allItems<TveVideo>(await getJson(appJson("alaunesliders"))));
+    const videos = await withYoutubeDurations(allItems<TveVideo>(await getJson(appJson("alaunesliders"), REVALIDATE_CATEGORY)));
     return videos.map(sliderToVideo);
   } catch {
     return [];
@@ -451,10 +429,10 @@ export async function getTveSliders(): Promise<VideoItem[]> {
 async function getAlauneEpisodes(): Promise<ReplayEpisode[]> {
   const menu = await getAndroidItem("CHAINE A la UNE");
   if (!menu?.feed_url) return [];
-  const groups = allItems<{ list_alaune_by_group?: string }>(await getJson(menu.feed_url));
+  const groups = allItems<{ list_alaune_by_group?: string }>(await getJson(menu.feed_url, REVALIDATE_CATEGORY));
   const url = groups[0]?.list_alaune_by_group;
   if (!url) return [];
-  const videos = await withYoutubeDurations(allItems<TveVideo>(await getJson(url)));
+  const videos = await withYoutubeDurations(allItems<TveVideo>(await getJson(url, REVALIDATE_CATEGORY)));
   return videos.map(replayTvToEpisode);
 }
 
@@ -472,7 +450,7 @@ async function getCategoryReplayEpisodes(limit: number, seen: Set<string>): Prom
   for (const category of categories.slice(0, 4)) {
     if (!category.video_feed_url || collected.length >= limit) break;
     try {
-      const videos = await withYoutubeDurations(allItems<TveVideo>(await getJson(category.video_feed_url)));
+      const videos = await withYoutubeDurations(allItems<TveVideo>(await getJson(category.video_feed_url, REVALIDATE_CATEGORY)));
       for (const video of videos) {
         const episode = replayTvToEpisode(video);
         if (seen.has(episode.id)) continue;
@@ -559,6 +537,7 @@ export async function getTveShorts(limit = 10): Promise<ShortItem[]> {
   try {
     const data = await getJson<TvePlaylist>(
       tveUrl("details", "playlist", "short-videos", TVE_APP_SLUG),
+      REVALIDATE_CATEGORY,
     );
     const videos = await withYoutubeDurations(playlistItems(data).slice(0, limit));
     return videos.map(shortToItem);
@@ -576,6 +555,7 @@ export async function getTveShortVideoUrl(slug: string) {
   try {
     const data = await getJson<TvePlaylist>(
       tveUrl("details", "playlist", "short-videos", TVE_APP_SLUG),
+      REVALIDATE_CATEGORY,
     );
     const item = playlistItems(data).find((video) => (video.slug || slugify(video.title)) === slug);
     return item?.video_url || "";
@@ -586,7 +566,7 @@ export async function getTveShortVideoUrl(slug: string) {
 
 export async function getTveGuideSlots(): Promise<ProgramSlot[]> {
   try {
-    const guide = await getJson<TveGuideChannel[]>(appJson("guidetvall", "today"));
+    const guide = await getJson<TveGuideChannel[]>(appJson("guidetvall", "today"), REVALIDATE_CATEGORY);
     const first = Array.isArray(guide) ? guide[0] : null;
     const slots = [...(first?.subitems?.matin ?? []), ...(first?.subitems?.soir ?? [])];
     return slots.map((slot) => ({

@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { allItems, getJson, getJsonUncached } from "@/lib/api/http";
 import { TVE_API_BASE, TVE_APP_SLUG } from "@/lib/env";
+import { REVALIDATE_CATEGORY, REVALIDATE_STATIC } from "@/lib/revalidate";
 import type { Article, CategorySlug } from "@/lib/types";
 import { decodeHtmlEntities, formatDisplayDate, stripHtml } from "@/lib/utils";
 
@@ -113,7 +114,7 @@ async function fetchNewsPayload(params?: Record<string, string | number>) {
 export async function getNewsCategories(): Promise<NewsCategory[]> {
   try {
     const categories = allItems<TveNewsCategory>(
-      await getJson(newsUrl("newscategories", { parent_id: 0 })),
+      await getJson(newsUrl("newscategories", { parent_id: 0 }), REVALIDATE_STATIC),
     );
     return categories
       .filter((item) => item.slug && item.slug !== "home")
@@ -165,7 +166,7 @@ export async function getNewsPosts(options?: {
         return posts.map((post) => postToArticle(post, categorySlug || undefined, Boolean(slug)));
       },
       ["tve-news-posts", TVE_APP_SLUG, String(perPage), categorySlug, slug],
-      { revalidate: 120 },
+      { revalidate: REVALIDATE_CATEGORY },
     )();
   } catch {
     return [];
@@ -199,7 +200,7 @@ export async function getNewsPostsPage(options?: {
         };
       },
       ["tve-news-page", TVE_APP_SLUG, String(perPage), categorySlug, cursor],
-      { revalidate: 60 },
+      { revalidate: REVALIDATE_CATEGORY },
     )();
   } catch {
     return { articles: [], nextCursor: null, hasMore: false };

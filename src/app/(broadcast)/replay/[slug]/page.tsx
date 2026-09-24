@@ -6,9 +6,9 @@ import { SiteWrap } from "@/components/media-image";
 import { ReplayPlayer } from "@/components/replay-player";
 import { ReplayVideoCard } from "@/components/replay-video-card";
 import { UpNextPanel } from "@/components/up-next-panel";
-import { getTveReplayById, getVideoPlayback } from "@/lib/api/tve";
+import { getTveReplayById } from "@/lib/api/tve";
 
-export const revalidate = 60;
+export const revalidate = 600; // REVALIDATE_CATEGORY
 
 export async function generateMetadata({
   params,
@@ -29,10 +29,7 @@ export default async function ReplayTvPage({
   const data = await getTveReplayById(slug);
   if (!data) notFound();
 
-  const streamUrl =
-    data.current.streamUrl ||
-    (data.current.streamFeedUrl ? await getVideoPlayback(data.current.streamFeedUrl) : "");
-  const episode = { ...data.current, streamUrl };
+  const episode = data.current;
   const others = data.related;
 
   return (

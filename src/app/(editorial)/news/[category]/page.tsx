@@ -9,7 +9,7 @@ import { getNewsCategory, getNewsNav, getNewsPostsPage } from "@/lib/api/news";
 import type { CategorySlug } from "@/lib/types";
 import { clipText, formatDisplayDate } from "@/lib/utils";
 
-export const revalidate = 120;
+export const revalidate = 600; // REVALIDATE_CATEGORY
 
 export async function generateStaticParams() {
   const nav = await getNewsNav();

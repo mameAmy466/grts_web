@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   title: "News",
 };
 
-export const revalidate = 120;
+export const revalidate = 600; // REVALIDATE_CATEGORY
 
 export default async function NewsPage() {
   const [posts, breaking, latestBucket, viewedBucket, choiceBucket] = await Promise.all([

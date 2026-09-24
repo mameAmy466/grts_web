@@ -7,7 +7,7 @@ import { MediaImage, SiteWrap } from "@/components/media-image";
 import { getTveEpisodes, getTveProgramCatalog, getTveShow, getTveShows, programEpisodeFeed } from "@/lib/api/tve";
 import { getProgramme, programmes, relatedProgrammes } from "@/lib/programmes";
 
-export const revalidate = 120;
+export const revalidate = 3600; // REVALIDATE_STATIC
 
 export async function generateStaticParams() {
   const fromApi = await getTveShows();

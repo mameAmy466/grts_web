@@ -19,6 +19,8 @@ import { getNewsPost, getNewsPosts } from "@/lib/api/news";
 import type { Article } from "@/lib/types";
 import { clipText, formatDisplayDate, unsplash } from "@/lib/utils";
 
+export const revalidate = 600; // REVALIDATE_CATEGORY
+
 export function generateStaticParams() {
   return allArticles().map((article) => ({
     category: article.category,

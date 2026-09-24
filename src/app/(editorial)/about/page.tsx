@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   title: "About",
 };
 
+export const revalidate = 3600; // REVALIDATE_STATIC
+
 export default function AboutPage() {
   return (
     <div className="pb-16">

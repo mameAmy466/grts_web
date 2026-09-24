@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "GRTS FM",
 };
 
-export const revalidate = 120;
+export const revalidate = 600; // REVALIDATE_CATEGORY
 
 export default async function RadioPage() {
   const radios = await getLiveRadios();

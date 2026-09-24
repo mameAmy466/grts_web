@@ -4,7 +4,7 @@ import { SiteWrap } from "@/components/media-image";
 import { ShortsPlayer } from "@/components/shorts-player";
 import { getTveShorts } from "@/lib/api/tve";
 
-export const revalidate = 60;
+export const revalidate = 600; // REVALIDATE_CATEGORY
 
 export async function generateMetadata({
   params,

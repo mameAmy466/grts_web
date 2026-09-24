@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "TV programs",
 };
 
-export const revalidate = 120;
+export const revalidate = 3600; // REVALIDATE_STATIC
 
 export default async function ProgrammesPage() {
   const { programmes, categories } = await getTveProgramCatalog();

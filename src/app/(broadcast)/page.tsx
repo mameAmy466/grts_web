@@ -16,7 +16,7 @@ import { homeHeadlines, homeNewsGrid, homeTopNews } from "@/lib/data";
 import { getTveReplayVideos, getTveShorts, getTveSliders } from "@/lib/api/tve";
 import { getNewsPosts } from "@/lib/api/news";
 
-export const revalidate = 120;
+export const revalidate = 120; // REVALIDATE_HOME
 
 export default async function HomePage() {
   const [choice, posts, sliders, replays, apiShorts] = await Promise.all([

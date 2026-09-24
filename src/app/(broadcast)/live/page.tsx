@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { LiveDesk, LiveLatestVideos } from "@/components/live-desk";
 import { ProgramGuide } from "@/components/program-guide";
-import { getLivePlayback, getLiveTvChannels, getTveGuideSlots, getTveReplayVideos, getTveSliders } from "@/lib/api/tve";
+import { getLiveTvChannels, getTveGuideSlots, getTveReplayVideos, getTveSliders } from "@/lib/api/tve";
 
 export const metadata: Metadata = {
   title: "Live",
 };
 
-export const revalidate = 20;
+export const revalidate = 600; // REVALIDATE_CATEGORY
 
 const fallbackDescription =
   "Watch GRTS TV live or switch to radio mode. Follow The Gambia's political, economic and social news in real time.";
@@ -27,13 +27,11 @@ async function LiveLatest() {
 export default async function LivePage() {
   const channels = await getLiveTvChannels();
   const channel = channels[0];
-  const stream = channel?.id ? await getLivePlayback(String(channel.id)) : "";
 
   return (
     <div className="bg-[#0A0A0A] pb-28">
       <Suspense fallback={<div className="h-[70vh] animate-pulse bg-white/5" />}>
       <LiveDesk
-        src={stream}
         channelId={channel?.id}
         liveTitle={channel ? `${channel.title} — Live Broadcast` : "GRTS TV — Live Broadcast"}
         liveDescription={channel?.desc || fallbackDescription}

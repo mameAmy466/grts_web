@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SectionHeading, VideoCard } from "@/components/cards";
 import { SiteWrap } from "@/components/media-image";
 import { LiveNowCopy, LiveRadioCard, LiveVideoPlayer } from "@/components/players";
-import { loadLivePlayback } from "@/app/(broadcast)/live/actions";
+import { fetchLivePlayback } from "@/lib/playback-client";
 import type { VideoItem } from "@/lib/types";
 import { youtubeEmbedUrl } from "@/lib/utils";
 
@@ -13,7 +13,6 @@ const LiveVideosContext = createContext<(videos: VideoItem[]) => void>(() => und
 
 type LiveDeskProps = {
   channelId?: string;
-  src?: string;
   liveTitle: string;
   liveDescription: string;
   latest?: ReactNode;
@@ -22,7 +21,6 @@ type LiveDeskProps = {
 
 export function LiveDesk({
   channelId,
-  src: initialSrc = "",
   liveTitle,
   liveDescription,
   latest,
@@ -35,18 +33,18 @@ export function LiveDesk({
   const [videos, setVideos] = useState<VideoItem[]>([]);
   const replay = videos.find((video) => video.id === selectedId) ?? null;
 
-  const [stream, setStream] = useState(initialSrc);
-  const [loadingStream, setLoadingStream] = useState(!initialSrc && Boolean(channelId));
+  const [stream, setStream] = useState("");
+  const [loadingStream, setLoadingStream] = useState(Boolean(channelId));
 
   useEffect(() => {
-    setStream(initialSrc);
-    if (initialSrc || !channelId) {
+    if (!channelId) {
+      setStream("");
       setLoadingStream(false);
       return;
     }
     let cancelled = false;
     setLoadingStream(true);
-    void loadLivePlayback(channelId).then((url) => {
+    void fetchLivePlayback(channelId).then((url) => {
       if (cancelled) return;
       setStream(url);
       setLoadingStream(false);
@@ -54,7 +52,7 @@ export function LiveDesk({
     return () => {
       cancelled = true;
     };
-  }, [channelId, initialSrc]);
+  }, [channelId]);
 
   function playVideo(video: VideoItem) {
     router.replace(`${pathname}?v=${video.id}`, { scroll: false });

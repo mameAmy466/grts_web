@@ -10,6 +10,7 @@ import {
 } from "@/components/icons";
 import { HlsPlayer } from "@/components/hls-player";
 import { MediaImage } from "@/components/media-image";
+import { fetchVideoPlayback } from "@/lib/playback-client";
 import type { ReplayEpisode } from "@/lib/types";
 import { formatDisplayDate, youtubeEmbedUrl } from "@/lib/utils";
 
@@ -28,6 +29,28 @@ export function ReplayPlayer({ episode }: { episode: ReplayEpisode }) {
   const [playing, setPlaying] = useState(false);
   const [current, setCurrent] = useState(start);
   const [expanded, setExpanded] = useState(false);
+  const [playbackUrl, setPlaybackUrl] = useState("");
+  const [loadingPlayback, setLoadingPlayback] = useState(false);
+  const catalogYoutube = youtubeEmbedUrl(episode.streamUrl);
+
+  useEffect(() => {
+    if (catalogYoutube || !episode.streamFeedUrl) {
+      setPlaybackUrl("");
+      setLoadingPlayback(false);
+      return;
+    }
+    let cancelled = false;
+    setLoadingPlayback(true);
+    setPlaybackUrl("");
+    void fetchVideoPlayback(episode.streamFeedUrl).then((url) => {
+      if (cancelled) return;
+      setPlaybackUrl(url);
+      setLoadingPlayback(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [catalogYoutube, episode.id, episode.streamFeedUrl]);
 
   useEffect(() => {
     if (!playing) return;
@@ -38,8 +61,9 @@ export function ReplayPlayer({ episode }: { episode: ReplayEpisode }) {
   }, [playing, episode.durationSeconds]);
 
   const progress = (current / episode.durationSeconds) * 100;
-  const youtubeSrc = youtubeEmbedUrl(episode.streamUrl);
-  const hasStream = Boolean(episode.streamUrl);
+  const youtubeSrc = catalogYoutube;
+  const streamUrl = youtubeSrc ? "" : playbackUrl || (loadingPlayback ? "" : episode.streamUrl || "");
+  const hasStream = Boolean(youtubeSrc || streamUrl || loadingPlayback);
 
   return (
     <div className="flex h-full flex-col">
@@ -53,9 +77,9 @@ export function ReplayPlayer({ episode }: { episode: ReplayEpisode }) {
               allowFullScreen
               className="absolute inset-0 h-full w-full"
             />
-          ) : episode.streamUrl ? (
+          ) : streamUrl ? (
             <HlsPlayer
-              src={episode.streamUrl}
+              src={streamUrl}
               poster={episode.image}
               className="absolute inset-0 h-full w-full object-cover"
             />
