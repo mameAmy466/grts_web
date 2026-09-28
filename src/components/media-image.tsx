@@ -1,5 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { PLACEHOLDER_IMAGE, cn } from "@/lib/utils";
 
 export function MediaImage({
   src,
@@ -14,14 +17,23 @@ export function MediaImage({
   priority?: boolean;
   sizes?: string;
 }) {
+  const [failed, setFailed] = useState(false);
+  const resolved = !failed && src && src !== "/logo.png" ? src : PLACEHOLDER_IMAGE;
+  const placeholder = resolved === PLACEHOLDER_IMAGE;
+
   return (
     <Image
-      src={src || "/logo.png"}
+      src={resolved}
       alt={alt}
       fill
       sizes={sizes}
       priority={priority}
-      className={cn("object-cover", className)}
+      onError={() => setFailed(true)}
+      className={cn(
+        placeholder ? "bg-[#5c5c5c] object-contain p-6 sm:p-8" : "object-cover",
+        !placeholder && className,
+        placeholder && className?.replace(/object-\S+/g, ""),
+      )}
     />
   );
 }

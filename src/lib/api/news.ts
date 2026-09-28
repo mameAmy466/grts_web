@@ -3,7 +3,7 @@ import { allItems, getJson, getJsonUncached } from "@/lib/api/http";
 import { TVE_API_BASE, TVE_APP_SLUG } from "@/lib/env";
 import { REVALIDATE_CATEGORY, REVALIDATE_STATIC } from "@/lib/revalidate";
 import type { Article, CategorySlug } from "@/lib/types";
-import { decodeHtmlEntities, formatDisplayDate, stripHtml } from "@/lib/utils";
+import { decodeHtmlEntities, formatDisplayDate, firstHtmlImage, stripHtml } from "@/lib/utils";
 
 const EDITORIAL_SLUGS = new Set([
   "home",
@@ -34,7 +34,11 @@ type TveNewsPost = {
   slug: string;
   excerpt?: string;
   content?: string;
+  image?: string;
   image_url?: string;
+  logo?: string;
+  logo_url?: string;
+  thumbnail?: string;
   published_at?: string;
   categories?: TveNewsTerm[];
 };
@@ -72,6 +76,18 @@ function cursorFromUrl(value?: string | null) {
   }
 }
 
+function newsImage(post: TveNewsPost) {
+  return (
+    post.image_url ||
+    post.image ||
+    post.logo_url ||
+    post.logo ||
+    post.thumbnail ||
+    firstHtmlImage(post.content) ||
+    ""
+  );
+}
+
 function topicCategory(categories: TveNewsTerm[] = []): TveNewsTerm | undefined {
   return categories.find((item) => !EDITORIAL_SLUGS.has(item.slug)) ?? categories[0];
 }
@@ -98,7 +114,7 @@ function postToArticle(
     categoryLabel: topic?.title?.toUpperCase() ?? "NEWS",
     date: formatDisplayDate(post.published_at) || post.published_at || "",
     readTime: includeContent ? `${Math.max(2, Math.round(words / 200))} min read` : undefined,
-    image: post.image_url ?? "",
+    image: newsImage(post),
     href: `/news/${slug}/${post.slug}`,
     author: "GRTS Newsroom",
     lead: excerpt,

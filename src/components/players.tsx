@@ -44,7 +44,9 @@ export function LiveVideoPlayer({
   const streamKey = youtubeSrc || src || "";
   const streamKeyRef = useRef(streamKey);
   const posterSrc = replay ? poster : undefined;
-  const waiting = Boolean(!error && (loading || (!youtubeSrc && !started)));
+  const hasMedia = Boolean(youtubeSrc || src);
+  const waiting = Boolean(!error && (loading || (hasMedia && !youtubeSrc && !started)));
+  const unavailable = Boolean(replay && !loading && !hasMedia && !error);
   radioPlayingRef.current = Boolean(radio?.playing);
 
   useEffect(() => {
@@ -172,9 +174,16 @@ export function LiveVideoPlayer({
             </p>
           </div>
         ) : null}
+        {unavailable ? (
+          <div className="absolute inset-0 z-[1] flex flex-col items-center justify-center bg-[#0A0A0A] px-6 text-center">
+            {posterSrc ? <MediaImage src={posterSrc} alt={title} className="opacity-40" /> : null}
+            <p className="relative text-sm font-medium text-white">Replay unavailable</p>
+            <p className="relative mt-2 max-w-sm text-xs text-zinc-400">This edition has no playable stream yet.</p>
+          </div>
+        ) : null}
         {error && !youtubeSrc ? (
           <div className="absolute inset-0 z-[1] flex flex-col items-center justify-center bg-[#0A0A0A] px-6 text-center">
-            <p className="text-sm font-medium text-white">Live stream unavailable</p>
+            <p className="text-sm font-medium text-white">{replay ? "Replay unavailable" : "Live stream unavailable"}</p>
             <p className="mt-2 max-w-sm text-xs text-zinc-400">{error}</p>
             <button
               type="button"
