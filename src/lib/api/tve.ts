@@ -13,6 +13,7 @@ import {
   isRealDuration,
   slugify,
   viewCount,
+  youtubeThumbUrl,
   youtubeVideoId,
 } from "@/lib/utils";
 
@@ -143,6 +144,10 @@ function tveUrl(...parts: Array<string | number>) {
 
 function videoClock(time?: string) {
   return isRealDuration(time) ? formatClockDuration(durationToSeconds(time!)) : "";
+}
+
+function videoPoster(item: Pick<TveVideo, "logo" | "logo_url" | "video_url">) {
+  return item.logo_url || item.logo || youtubeThumbUrl(item.video_url) || "";
 }
 
 async function youtubeApiKey() {
@@ -526,7 +531,7 @@ function shortToItem(item: TveVideo): ShortItem {
     id: slug,
     title: item.title,
     category: item.chaine_name || "Shorts",
-    image: item.logo_url || item.logo || "",
+    image: videoPoster(item),
     duration: videoClock(item.time),
     href: `/shorts/${slug}`,
     videoUrl: item.video_url,
@@ -590,8 +595,8 @@ function videoToProgram(video: TveVideo, category: TveVodCategory): Program {
     filter: category.slug || slugify(category.title),
     schedule: formatDisplayDate(video.date) || category.title,
     duration: videoClock(video.time),
-    image: video.logo_url || video.logo || "",
-    poster: video.logo_url || video.logo,
+    image: videoPoster(video),
+    poster: videoPoster(video),
     description: video.desc || video.title,
     feedUrl: video.webdetail_url || video.feed_url,
     videoFeedUrl: category.video_feed_url,
@@ -630,7 +635,7 @@ function videoToReplay(item: TveVideo, programSlug: string): ReplayEpisode {
     views: formatViewCount(item.views),
     duration: videoClock(item.time),
     durationSeconds: durationToSeconds(item.time || ""),
-    image: item.logo_url || item.logo || "",
+    image: videoPoster(item),
     about: item.desc || item.title,
     streamFeedUrl: item.feed_url || item.webdetail_url,
     streamUrl: item.video_url,
@@ -682,7 +687,7 @@ function sliderToVideo(item: TveVideo): VideoItem {
   return {
     id: slug,
     title: item.title,
-    image: item.logo_url || item.logo || "",
+    image: videoPoster(item),
     posted: formatDisplayDate(item.date),
     description: item.desc,
     category: item.chaine_name || "",

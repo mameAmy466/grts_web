@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { IconArrowRight, IconClock, IconPlay } from "@/components/icons";
 import { MediaImage } from "@/components/media-image";
@@ -115,13 +114,10 @@ export function ShortCard({
   );
   const content = (
     <>
-      <Image
-        src={item.image || "/logo.png"}
+      <MediaImage
+        src={item.image}
         alt={item.title}
-        width={220}
-        height={350}
         sizes="220px"
-        className="absolute inset-0 h-full w-full max-w-none object-cover object-center"
       />
       <div
         className="absolute inset-0"

@@ -3,7 +3,19 @@ export function cn(...classes: Array<string | false | null | undefined>) {
 }
 
 export function unsplash(_id?: string, _width = 1200) {
-  return "/logo.png";
+  return "/placeholder.png";
+}
+
+export const PLACEHOLDER_IMAGE = "/placeholder.png";
+
+export function firstHtmlImage(html?: string) {
+  const match = html?.match(/<img[^>]+src=["']([^"']+)["']/i);
+  return match?.[1]?.trim() || "";
+}
+
+export function youtubeThumbUrl(url?: string) {
+  const id = youtubeVideoId(url);
+  return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "";
 }
 
 export function titleCase(slug: string) {

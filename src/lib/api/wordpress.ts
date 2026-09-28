@@ -1,7 +1,7 @@
 import { getJson, getJsonMeta } from "@/lib/api/http";
 import { WORDPRESS_API_BASE } from "@/lib/env";
 import type { Article, CategorySlug } from "@/lib/types";
-import { decodeHtmlEntities, formatWpDate, stripHtml } from "@/lib/utils";
+import { decodeHtmlEntities, firstHtmlImage, formatWpDate, stripHtml } from "@/lib/utils";
 
 type WpRendered = { rendered?: string };
 type WpTerm = { id: number; name: string; slug: string; count?: number };
@@ -151,7 +151,7 @@ function postToArticle(post: WpPost): Article {
     categoryLabel: category?.name?.toUpperCase() ?? "NEWS",
     date: formatWpDate(post.date),
     readTime: `${Math.max(2, Math.round(stripHtml(content).split(/\s+/).length / 200))} min read`,
-    image: media?.source_url ?? "",
+    image: media?.source_url || firstHtmlImage(post.content?.rendered) || "",
     href: `/news/${categorySlug}/${post.slug}`,
     author: author?.name,
     authorImage: author?.avatar_urls?.["96"],
