@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
-import { EpisodeCard, SectionHeading } from "@/components/cards";
+import { SectionHeading } from "@/components/cards";
 import { SiteWrap } from "@/components/media-image";
 import { FmNowPlaying, FmPlayerBar } from "@/components/players";
+import { RadioEpisodes } from "@/components/radio-episodes";
 import { getLiveRadios } from "@/lib/api/tve";
 import { episodes } from "@/lib/data";
+import type { RadioStation } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "GRTS FM",
@@ -14,13 +16,34 @@ export const revalidate = 600; // REVALIDATE_CATEGORY
 export default async function RadioPage() {
   const radios = await getLiveRadios();
   const current = radios[0];
-  const radioEpisodes = radios.slice(0, 8).map((radio) => ({
-    id: radio.slug || radio.title,
-    title: radio.title,
-    category: "Radio",
-    duration: "Live",
-    href: "/radio",
-  }));
+  const fallbackStation: RadioStation = {
+    id: current?.slug || current?.title || "grts-radio",
+    title: current?.title || "GRTS Radio",
+    description: current?.desc || "National Radio - Gambia",
+    streamUrl: current?.stream_url || "",
+    image: current?.hd_logo || current?.sd_logo || "",
+  };
+  const radioEpisodes = radios.length
+    ? radios.slice(0, 8).map((radio) => ({
+        id: radio.slug || radio.title,
+        title: radio.title,
+        category: "Radio",
+        duration: "Live",
+        href: "/radio",
+        image: radio.hd_logo || radio.sd_logo || "",
+        station: {
+          id: radio.slug || radio.title,
+          title: radio.title || "GRTS Radio",
+          description: radio.desc || "National Radio - Gambia",
+          streamUrl: radio.stream_url || "",
+          image: radio.hd_logo || radio.sd_logo || "",
+        } satisfies RadioStation,
+      }))
+    : episodes.map((episode) => ({
+        ...episode,
+        image: episode.image || fallbackStation.image,
+        station: fallbackStation,
+      }));
 
   return (
     <div className="bg-[#0d0d0d] pb-20">
@@ -54,11 +77,7 @@ export default async function RadioPage() {
 
       <SiteWrap className="pt-12">
         <SectionHeading title="Recent Episodes" />
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {(radioEpisodes.length ? radioEpisodes : episodes).map((episode) => (
-            <EpisodeCard key={episode.id} episode={episode} />
-          ))}
-        </div>
+        <RadioEpisodes items={radioEpisodes} />
       </SiteWrap>
     </div>
   );

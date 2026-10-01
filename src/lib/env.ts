@@ -8,10 +8,12 @@ function baseFromAppDetailsUrl(url?: string) {
   return match?.[1];
 }
 
-export const TVE_APP_SLUG =
+const configuredSlug =
   process.env.NEXT_PUBLIC_TVE_APP_SLUG ??
   slugFromAppDetailsUrl(process.env.EXPO_PUBLIC_API_URL) ??
   "grts";
+
+export const TVE_APP_SLUG = configuredSlug === "dmedia" ? "grts" : configuredSlug;
 
 export const TVE_API_BASE =
   process.env.NEXT_PUBLIC_TVE_API_BASE ??
@@ -27,6 +29,4 @@ export const WORDPRESS_API_BASE = wordpressApiBase(
   process.env.NEXT_PUBLIC_WORDPRESS_API_BASE,
 );
 
-export const TVE_APP_DETAILS_URL =
-  process.env.EXPO_PUBLIC_API_URL ??
-  `${TVE_API_BASE}/appdetails/${TVE_APP_SLUG}`;
+export const TVE_APP_DETAILS_URL = `${TVE_API_BASE}/appdetails/${TVE_APP_SLUG}`;

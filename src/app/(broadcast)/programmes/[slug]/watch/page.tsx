@@ -5,7 +5,7 @@ import { ProgrammeWatch } from "@/components/programme-watch";
 import { getTveEpisodes, getTveShow, programAsEpisode, programEpisodeFeed } from "@/lib/api/tve";
 import { getProgramme, getReplay } from "@/lib/programmes";
 
-export const revalidate = 600; // REVALIDATE_CATEGORY
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -24,10 +24,11 @@ export default async function ProgrammeReplayPage({
 }) {
   const { slug } = await params;
   const program = (await getTveShow(slug)) ?? getProgramme(slug);
-  const apiEpisodes = await getTveEpisodes(programEpisodeFeed(program), slug);
   if (!program) notFound();
+  const apiEpisodes = await getTveEpisodes(program.feedUrl || programEpisodeFeed(program), program.slug);
   const own = program.streamUrl ? programAsEpisode(program) : null;
-  const episodes = own && !apiEpisodes.some((item) => item.id === own.id) ? [own, ...apiEpisodes] : apiEpisodes;
+  const rest = apiEpisodes.filter((item) => !own || item.id !== own.id);
+  const episodes = own ? [own, ...rest] : apiEpisodes;
   const fallback = getReplay(slug);
   if (!episodes.length && !fallback) notFound();
 

@@ -47,13 +47,10 @@ export function ProgrammesCatalog({
       const matchesQuery =
         !needle ||
         program.title.toLowerCase().includes(needle) ||
-        program.badge.toLowerCase().includes(needle) ||
-        program.schedule.toLowerCase().includes(needle);
+        program.badge.toLowerCase().includes(needle);
       if (!matchesFilter || !matchesQuery) return false;
-      if (filter === "all") {
-        if (seen.has(program.slug)) return false;
-        seen.add(program.slug);
-      }
+      if (seen.has(program.slug)) return false;
+      seen.add(program.slug);
       return true;
     });
   }, [filter, query, programmes]);
@@ -84,7 +81,7 @@ export function ProgrammesCatalog({
                     event.currentTarget.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
                   }}
                   className={cn(
-                    "shrink-0 snap-start rounded-full px-3.5 py-1.5 text-sm font-medium whitespace-nowrap",
+                    "shrink-0 snap-start rounded-full border-0 px-3.5 py-1.5 text-sm font-medium whitespace-nowrap",
                     filter === item.id
                       ? "bg-brand text-white"
                       : "btn-glass-dark text-zinc-200 hover:text-white",
@@ -111,7 +108,7 @@ export function ProgrammesCatalog({
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search a programme"
-              className="h-10 w-full rounded-full border border-white/10 bg-[#1a1a1a] pl-9 pr-4 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-brand"
+              className="btn-glass-dark h-10 w-full rounded-full pl-9 pr-4 text-sm text-white outline-none placeholder:text-zinc-400 focus:ring-0"
             />
           </label>
         </div>
@@ -121,9 +118,9 @@ export function ProgrammesCatalog({
             No programme matches that search.
           </p>
         ) : (
-          <div className="mt-8 grid grid-cols-2 justify-center gap-3 sm:grid-cols-[repeat(auto-fill,minmax(160px,209px))] sm:justify-start sm:gap-4">
+          <div className="mt-8 grid w-full grid-cols-2 items-stretch justify-items-stretch gap-3 md:grid-cols-4 md:gap-4">
             {visible.map((program) => (
-              <ProgramCard key={`${program.slug}-${program.filter}`} program={program} />
+              <ProgramCard key={program.slug} program={program} />
             ))}
           </div>
         )}

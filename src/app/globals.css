@@ -7,6 +7,8 @@
   --color-bg-secondary: #171717;
   --color-bg-tertiary: #f5f5f5;
   --color-surface-default: #171717;
+  --color-bg-elevated: #262626;
+  --color-border-default: #404040;
   --color-text-disabled: #525252;
   --color-text-secondary: #a3a3a3;
   --site-header: 68px;
@@ -87,7 +89,7 @@ body {
 
 .btn-glass {
   background: rgba(255, 255, 255, 0.42);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 0;
   box-shadow: none;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -95,9 +97,17 @@ body {
 
 .btn-glass-dark {
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 0;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+}
+
+.card-glass {
+  background: rgba(255, 255, 255, 0.02);
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .player-controls-glass {
@@ -105,10 +115,10 @@ body {
   height: 72px;
   gap: 8px;
   padding: 8px 12px 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border: 0;
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
-  background: #00000066;
+  background: rgba(0, 0, 0, 0.22);
 }
 
 .featured-card-glass {
@@ -117,7 +127,7 @@ body {
   min-height: 104px;
   gap: 10px;
   padding: 10px 12px 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border: 0;
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
   background: #00000066;

@@ -1,26 +1,30 @@
+"use client";
+
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { socialIcons } from "@/components/icons";
+import { useLocale } from "@/components/locale-provider";
 import { SITE, socialLinks } from "@/lib/data";
 import type { ChromeTheme } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-const broadcast = [
-  { href: "/live", label: "Live TV" },
-  { href: "/radio", label: "Radio Gambia" },
-  { href: "/programmes", label: "Programmes" },
-  { href: "/live#guide", label: "Schedules" },
-];
-
-const company = [
-  { href: "/about", label: "About Us" },
-  { href: "/news", label: "News & Press" },
-  { href: "/about#careers", label: "Careers" },
-  { href: "/about#contact", label: "Contact" },
-];
-
 export function SiteFooter({ theme }: { theme: ChromeTheme }) {
   const dark = theme === "dark";
+  const { t } = useLocale();
+
+  const broadcast = [
+    { href: "/live", label: t("liveTv") },
+    { href: "/radio", label: t("radioGambia") },
+    { href: "/programmes", label: t("programmes") },
+    { href: "/live#guide", label: t("schedules") },
+  ];
+
+  const company = [
+    { href: "/about", label: t("aboutUs") },
+    { href: "/news", label: t("newsPress") },
+    { href: "/about#careers", label: t("careers") },
+    { href: "/about#contact", label: t("contact") },
+  ];
 
   return (
     <footer
@@ -37,7 +41,7 @@ export function SiteFooter({ theme }: { theme: ChromeTheme }) {
           <p className="mt-4 max-w-xs text-sm leading-6">{SITE.tagline}</p>
         </div>
         <div>
-          <h3 className="text-xs font-bold tracking-[0.14em] text-brand">BROADCAST</h3>
+          <h3 className="text-xs font-bold tracking-[0.14em] text-brand">{t("broadcast").toUpperCase()}</h3>
           <ul className="mt-4 space-y-2.5 text-sm">
             {broadcast.map((item) => (
               <li key={item.href}>
@@ -45,7 +49,7 @@ export function SiteFooter({ theme }: { theme: ChromeTheme }) {
                   href={item.href}
                   className={cn(
                     "hover:text-brand",
-                    item.label === "Programmes" && (dark ? "font-semibold text-white" : "font-semibold text-zinc-900"),
+                    item.href === "/programmes" && (dark ? "font-semibold text-white" : "font-semibold text-zinc-900"),
                   )}
                 >
                   {item.label}
@@ -55,7 +59,7 @@ export function SiteFooter({ theme }: { theme: ChromeTheme }) {
           </ul>
         </div>
         <div>
-          <h3 className="text-xs font-bold tracking-[0.14em] text-brand">COMPANY</h3>
+          <h3 className="text-xs font-bold tracking-[0.14em] text-brand">{t("company").toUpperCase()}</h3>
           <ul className="mt-4 space-y-2.5 text-sm">
             {company.map((item) => (
               <li key={item.href}>
@@ -67,7 +71,7 @@ export function SiteFooter({ theme }: { theme: ChromeTheme }) {
           </ul>
         </div>
         <div>
-          <h3 className="text-xs font-bold tracking-[0.14em] text-brand">FOLLOW US</h3>
+          <h3 className="text-xs font-bold tracking-[0.14em] text-brand">{t("followUs").toUpperCase()}</h3>
           <div className="mt-4 flex gap-2">
             {socialLinks.map((item) => {
               const Icon = socialIcons[item.name];
@@ -88,7 +92,7 @@ export function SiteFooter({ theme }: { theme: ChromeTheme }) {
               );
             })}
           </div>
-          <p className="mt-6 text-xs font-medium">Download our apps from</p>
+          <p className="mt-6 text-xs font-medium">{t("downloadApps")}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <StoreBadge store="apple" />
             <StoreBadge store="google" />
@@ -102,8 +106,8 @@ export function SiteFooter({ theme }: { theme: ChromeTheme }) {
         )}
       >
         <div className="mx-auto flex w-full max-w-[1514px] flex-col gap-2 px-4 py-4 text-xs sm:flex-row sm:items-center sm:justify-between sm:px-8 xl:px-32">
-          <p>© 2026 GRTS Gambia. All rights reserved.</p>
-          <p>A service of the Government of The Gambia</p>
+          <p>{t("rights")}</p>
+          <p>{t("government")}</p>
         </div>
       </div>
     </footer>

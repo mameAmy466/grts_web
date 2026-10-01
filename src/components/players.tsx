@@ -239,7 +239,7 @@ export function LiveVideoPlayer({
           >
             {muted ? <IconVolumeOff className="h-5 w-5" /> : <IconVolume className="h-5 w-5" />}
           </button>
-          <span className="hidden rounded border border-white/20 px-2 py-0.5 text-[11px] sm:inline">
+          <span className="btn-glass-dark hidden rounded-full px-2 py-0.5 text-[11px] sm:inline">
             1080p
           </span>
           <button type="button" aria-label="Fullscreen" onClick={toggleFullscreen} className="flex h-8 w-8 items-center justify-center">
@@ -420,6 +420,8 @@ export function FmPlayerBar({
 }) {
   const radio = useRadioPlayer();
   const playing = radio?.playing ?? false;
+  const stationTitle = radio?.station?.title || title;
+  const stationImage = radio?.station?.image || image;
 
   async function toggle() {
     if (radio) {
@@ -434,13 +436,13 @@ export function FmPlayerBar({
         <div className="flex min-w-0 items-center gap-3">
           <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-[12px] bg-zinc-700">
             <MediaImage
-              src={image || unsplash("photo-1475721027785-f74eccf877e2", 200)}
-              alt={title}
+              src={stationImage || unsplash("photo-1475721027785-f74eccf877e2", 200)}
+              alt={stationTitle}
               sizes="48px"
             />
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-white">{title}</p>
+            <p className="truncate text-sm font-semibold text-white">{stationTitle}</p>
             <span className="rounded bg-brand px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
               Live
             </span>

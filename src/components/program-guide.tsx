@@ -46,7 +46,7 @@ export function ProgramGuide({ todaySlots }: { todaySlots?: ProgramSlot[] }) {
   }, [tab, slots]);
 
   return (
-    <aside id="guide" className="rounded-xl border border-white/10 bg-[#141414] p-4 md:p-5">
+    <aside id="guide" className="card-glass rounded-xl bg-white/[0.02] p-4 backdrop-blur-xl md:p-5">
       <div className="mb-4 flex items-center gap-2">
         <IconCalendar className="h-5 w-5 text-brand" />
         <h2 className="text-lg font-bold text-white">Program Guide</h2>
@@ -79,8 +79,8 @@ function GuideRow({ slot, live }: { slot: ProgramSlot; live: boolean }) {
   return (
     <li
       className={cn(
-        "relative flex items-start gap-3 rounded-lg border px-3 py-2.5",
-        live ? "border-brand bg-transparent" : "border-transparent",
+        "relative flex items-start gap-3 rounded-lg px-3 py-2.5",
+        live ? "bg-white/5" : "",
       )}
     >
       {live ? (

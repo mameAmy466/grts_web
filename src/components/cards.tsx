@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { IconArrowRight, IconClock, IconPlay } from "@/components/icons";
+import { IconArrowRight, IconClock, IconPause, IconPlay } from "@/components/icons";
 import { MediaImage } from "@/components/media-image";
 import type { Article, Episode, ShortItem, VideoItem } from "@/lib/types";
 import { clipText, cn, formatDisplayDate, isRealDuration } from "@/lib/utils";
@@ -45,15 +45,15 @@ export function VideoCard({
   compact?: boolean;
 }) {
   const cardClassName = cn(
-    "group flex h-auto w-full max-w-[267px] flex-col gap-2.5 rounded-lg border border-transparent text-left sm:h-[233px]",
-    selected && "rounded-xl border-white/10 bg-[#141414] p-4",
+    "group flex h-full w-full flex-col gap-2.5 rounded-lg text-left",
+    selected && "rounded-xl bg-[#141414] p-4",
     className,
   );
   const date = formatDisplayDate(video.posted);
   const description = video.description?.trim();
   const content = (
     <>
-      <div className="relative h-[150px] w-full shrink-0 overflow-hidden rounded-[8px] bg-zinc-800">
+      <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-[8px] bg-zinc-800">
         <MediaImage
           src={video.image}
           alt={video.title}
@@ -271,24 +271,69 @@ export function SideNewsRow({
   );
 }
 
-export function EpisodeCard({ episode }: { episode: Episode }) {
-  return (
-    <Link
-      href={episode.href}
-      className="group overflow-hidden rounded-[12px] border border-white/15 bg-[#171717] opacity-100"
-    >
-      <div className="relative flex aspect-video items-center justify-center overflow-hidden bg-[#1b1530]">
-        <WaveArt />
-        <PlayBadge className="relative z-10 h-11 w-11" />
+export function EpisodeCard({
+  episode,
+  playing = false,
+  onSelect,
+}: {
+  episode: Episode;
+  playing?: boolean;
+  onSelect?: () => void;
+}) {
+  const content = (
+    <>
+      <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-xl bg-brand">
+        {episode.image ? (
+          <MediaImage
+            src={episode.image}
+            alt={episode.title}
+            sizes="246px"
+            className="!object-contain"
+          />
+        ) : (
+          <WaveArt />
+        )}
+        <div className="absolute inset-0 bg-black/30" />
+        {playing ? (
+          <span className="btn-glass relative z-10 flex h-11 w-11 items-center justify-center rounded-full text-zinc-800">
+            <IconPause className="h-4 w-4" />
+          </span>
+        ) : (
+          <span className="btn-glass relative z-10 flex h-11 w-11 items-center justify-center rounded-full text-zinc-800">
+            <IconPlay className="ml-0.5 h-4 w-4" />
+          </span>
+        )}
       </div>
-      <div className="p-4">
-        <p className="text-[11px] uppercase tracking-wide text-zinc-500">{episode.category}</p>
-        <h3 className="mt-1 text-sm font-semibold text-white group-hover:text-brand">{episode.title}</h3>
-        <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-zinc-400">
+      <div className="shrink-0">
+        <p className="text-[11px] font-medium text-[var(--color-text-secondary,#a3a3a3)]">
+          {playing ? <span className="font-semibold uppercase tracking-wide text-brand">Now playing</span> : episode.category}
+        </p>
+        <h3 className="mt-1 line-clamp-2 text-sm font-semibold leading-snug text-white group-hover:text-brand">
+          {episode.title}
+        </h3>
+        <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-[var(--color-text-secondary,#a3a3a3)]">
           <IconClock className="h-3.5 w-3.5" />
           {episode.duration}
         </p>
       </div>
+    </>
+  );
+
+  const className = cn(
+    "flex h-[290px] w-[278px] flex-col gap-4 rounded-2xl border border-[var(--color-border-default,#404040)] bg-[var(--color-bg-elevated,#262626)] p-4 text-left opacity-100 shadow-[0px_4px_12px_0px_#00000010]",
+  );
+
+  if (onSelect) {
+    return (
+      <button type="button" onClick={onSelect} className={className} aria-current={playing || undefined}>
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <Link href={episode.href} className={className}>
+      {content}
     </Link>
   );
 }
