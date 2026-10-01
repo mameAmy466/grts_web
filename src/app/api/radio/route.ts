@@ -2,9 +2,11 @@ import { getLiveRadios } from "@/lib/api/tve";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
   const radios = await getLiveRadios();
-  const url = radios[0]?.stream_url;
+  const slug = new URL(request.url).searchParams.get("s");
+  const radio = radios.find((item) => (item.slug || item.title) === slug) ?? radios[0];
+  const url = radio?.stream_url;
   if (!url) return new Response("Radio stream unavailable", { status: 404 });
 
   const upstream = await fetch(url, {

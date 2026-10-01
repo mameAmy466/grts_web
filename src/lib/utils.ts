@@ -26,7 +26,7 @@ export function titleCase(slug: string) {
 }
 
 export function slugify(value: string) {
-  return value
+  return String(value ?? "")
     .toLowerCase()
     .replace(/['’]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
@@ -99,10 +99,11 @@ function parseFlexibleDate(value: string) {
 }
 
 export function formatDisplayDate(value?: string) {
-  if (!value) return "";
-  if (/^le \d/i.test(value.trim())) return value;
-  const date = parseFlexibleDate(value);
-  if (!date) return value;
+  if (value == null || value === "") return "";
+  const text = String(value);
+  if (/^le \d/i.test(text.trim())) return text;
+  const date = parseFlexibleDate(text);
+  if (!date) return text;
   const day = date.getDate();
   const month = date.toLocaleDateString("fr-FR", { month: "long" });
   return `le ${day === 1 ? "1er" : day} ${month} ${date.getFullYear()}`;
@@ -121,10 +122,15 @@ export function colorFromLabel(label: string) {
 
 export function youtubeVideoId(url?: string) {
   if (!url) return "";
+  const trimmed = url.trim();
+  if (/^[\w-]{11}$/.test(trimmed)) return trimmed;
   try {
-    const parsed = new URL(url);
+    const parsed = new URL(trimmed);
     if (!parsed.hostname.includes("youtu")) return "";
-    return parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop() || "";
+    const fromQuery = parsed.searchParams.get("v") || "";
+    if (/^[\w-]{11}$/.test(fromQuery)) return fromQuery;
+    const fromPath = parsed.pathname.split("/").filter(Boolean).pop() || "";
+    return /^[\w-]{11}$/.test(fromPath) ? fromPath : "";
   } catch {
     return "";
   }
@@ -135,15 +141,19 @@ export function youtubeEmbedUrl(url?: string, params = "") {
   return id ? `https://www.youtube.com/embed/${id}?rel=0${params}` : "";
 }
 
-export function durationToSeconds(value: string) {
-  const parts = value.split(":").map((part) => Number(part) || 0);
+export function durationToSeconds(value: string | number | undefined) {
+  if (typeof value === "number") return Number.isFinite(value) && value > 0 ? value : 0;
+  const text = String(value ?? "").trim();
+  if (!text) return 0;
+  if (/^\d+(\.\d+)?$/.test(text)) return Number(text) || 0;
+  const parts = text.split(":").map((part) => Number(part) || 0);
   if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
   if (parts.length === 2) return parts[0] * 60 + parts[1];
   return 0;
 }
 
-export function isRealDuration(value?: string) {
-  return Boolean(value && durationToSeconds(value) > 0);
+export function isRealDuration(value?: string | number) {
+  return durationToSeconds(value) > 0;
 }
 
 export function formatClockDuration(seconds: number) {

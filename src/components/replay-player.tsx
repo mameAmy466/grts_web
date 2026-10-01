@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   IconExpand,
   IconPause,
@@ -12,7 +13,183 @@ import { HlsPlayer } from "@/components/hls-player";
 import { MediaImage } from "@/components/media-image";
 import { fetchVideoPlayback } from "@/lib/playback-client";
 import type { ReplayEpisode } from "@/lib/types";
-import { formatDisplayDate, youtubeEmbedUrl } from "@/lib/utils";
+import { formatDisplayDate, youtubeEmbedUrl, youtubeVideoId } from "@/lib/utils";
+
+type YtPlayer = {
+  loadVideoById: (id: string) => void;
+  cueVideoById: (id: string) => void;
+  destroy: () => void;
+};
+
+type YtApi = {
+  Player: new (
+    element: HTMLElement,
+    options: {
+      width?: string | number;
+      height?: string | number;
+      videoId: string;
+      playerVars?: Record<string, string | number>;
+      events?: {
+        onStateChange?: (event: { data: number }) => void;
+      };
+    },
+  ) => YtPlayer;
+  PlayerState: { ENDED: number; PLAYING: number };
+};
+
+function loadYoutubeApi() {
+  const win = window as Window & { YT?: YtApi; onYouTubeIframeAPIReady?: () => void };
+  if (win.YT?.Player) return Promise.resolve(win.YT);
+  return new Promise<YtApi>((resolve) => {
+    const previous = win.onYouTubeIframeAPIReady;
+    win.onYouTubeIframeAPIReady = () => {
+      previous?.();
+      if (win.YT) resolve(win.YT);
+    };
+    if (!document.getElementById("youtube-iframe-api")) {
+      const script = document.createElement("script");
+      script.id = "youtube-iframe-api";
+      script.src = "https://www.youtube.com/iframe_api";
+      document.head.appendChild(script);
+    }
+  });
+}
+
+function YoutubePlayer({
+  videoId,
+  title,
+  autoPlay = false,
+  onEnded,
+}: {
+  videoId: string;
+  title: string;
+  autoPlay?: boolean;
+  onEnded?: () => void;
+}) {
+  const hostRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<YtPlayer | null>(null);
+  const videoIdRef = useRef(videoId);
+  const onEndedRef = useRef(onEnded);
+  const autoPlayRef = useRef(autoPlay);
+  const playedRef = useRef(autoPlay);
+  const endedRef = useRef(false);
+  videoIdRef.current = videoId;
+  onEndedRef.current = onEnded;
+  autoPlayRef.current = autoPlay;
+
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    let cancelled = false;
+    let player: YtPlayer | null = null;
+
+    void loadYoutubeApi().then((YT) => {
+      if (cancelled || !hostRef.current) return;
+      player = new YT.Player(hostRef.current, {
+        width: "100%",
+        height: "100%",
+        videoId: videoIdRef.current,
+        playerVars: {
+          autoplay: autoPlayRef.current ? 1 : 0,
+          enablejsapi: 1,
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1,
+          origin: window.location.origin,
+        },
+        events: {
+          onStateChange: (event) => {
+            if (event.data === YT.PlayerState.PLAYING) {
+              playedRef.current = true;
+              endedRef.current = false;
+            }
+            if (event.data === YT.PlayerState.ENDED || event.data === 0) {
+              if (endedRef.current) return;
+              endedRef.current = true;
+              onEndedRef.current?.();
+            }
+          },
+        },
+      });
+      playerRef.current = player;
+    });
+
+    return () => {
+      cancelled = true;
+      player?.destroy();
+      playerRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    endedRef.current = false;
+    const player = playerRef.current;
+    if (!player) return;
+    if (playedRef.current || autoPlay) player.loadVideoById(videoId);
+    else player.cueVideoById(videoId);
+  }, [videoId, autoPlay]);
+
+  return (
+    <div className="absolute inset-0 h-full w-full [&_iframe]:h-full [&_iframe]:w-full">
+      <div ref={hostRef} title={title} className="h-full w-full" />
+    </div>
+  );
+}
+
+function ExpandableText({ text }: { text: string }) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  const fullRef = useRef<HTMLParagraphElement>(null);
+  const [expanded, setExpanded] = useState(false);
+  const [overflows, setOverflows] = useState(false);
+
+  useLayoutEffect(() => {
+    setExpanded(false);
+  }, [text]);
+
+  useLayoutEffect(() => {
+    const box = boxRef.current;
+    const full = fullRef.current;
+    if (!box || !full) return;
+
+    function measure() {
+      if (!full) return;
+      const lineHeight = parseFloat(getComputedStyle(full).lineHeight) || 28;
+      setOverflows(full.scrollHeight > lineHeight * 3 + 1);
+    }
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(box);
+    observer.observe(full);
+    return () => observer.disconnect();
+  }, [text]);
+
+  if (!text.trim()) return null;
+
+  return (
+    <div ref={boxRef} className="relative mt-2">
+      <p
+        ref={fullRef}
+        aria-hidden
+        className="invisible pointer-events-none absolute inset-x-0 text-sm leading-7"
+      >
+        {text}
+      </p>
+      <p className={`text-sm leading-7 text-zinc-400 ${expanded ? "" : "line-clamp-3"}`}>
+        {text}
+      </p>
+      {overflows ? (
+        <button
+          type="button"
+          onClick={() => setExpanded((value) => !value)}
+          className="mt-2 text-sm font-semibold text-brand"
+        >
+          {expanded ? "Show less" : "Show more"}
+        </button>
+      ) : null}
+    </div>
+  );
+}
 
 function formatTime(total: number) {
   const minutes = Math.floor(total / 60)
@@ -24,14 +201,25 @@ function formatTime(total: number) {
   return `${minutes}:${seconds}`;
 }
 
-export function ReplayPlayer({ episode }: { episode: ReplayEpisode }) {
+export function ReplayPlayer({
+  episode,
+  nextHref,
+}: {
+  episode: ReplayEpisode;
+  nextHref?: string;
+}) {
+  const router = useRouter();
   const start = Math.min(12, Math.max(0, episode.durationSeconds - 1));
   const [playing, setPlaying] = useState(false);
   const [current, setCurrent] = useState(start);
-  const [expanded, setExpanded] = useState(false);
   const [playbackUrl, setPlaybackUrl] = useState("");
   const [loadingPlayback, setLoadingPlayback] = useState(false);
+  const [continueAutoplay, setContinueAutoplay] = useState(false);
+  const [shareLabel, setShareLabel] = useState("Share");
+  const shareTimer = useRef<number | null>(null);
   const catalogYoutube = youtubeEmbedUrl(episode.streamUrl);
+  const youtubeId = youtubeVideoId(episode.streamUrl);
+  const autoPlayNext = useSearchParams().get("play") === "1";
 
   useEffect(() => {
     if (catalogYoutube || !episode.streamFeedUrl) {
@@ -53,6 +241,21 @@ export function ReplayPlayer({ episode }: { episode: ReplayEpisode }) {
   }, [catalogYoutube, episode.id, episode.streamFeedUrl]);
 
   useEffect(() => {
+    return () => {
+      if (shareTimer.current) window.clearTimeout(shareTimer.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!autoPlayNext) return;
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("play")) return;
+    url.searchParams.delete("play");
+    const next = `${url.pathname}${url.search}${url.hash}`;
+    window.history.replaceState(window.history.state, "", next);
+  }, [autoPlayNext]);
+
+  useEffect(() => {
     if (!playing) return;
     const timer = window.setInterval(() => {
       setCurrent((value) => (value >= episode.durationSeconds ? 0 : value + 1));
@@ -65,22 +268,53 @@ export function ReplayPlayer({ episode }: { episode: ReplayEpisode }) {
   const streamUrl = youtubeSrc ? "" : playbackUrl || (loadingPlayback ? "" : episode.streamUrl || "");
   const hasStream = Boolean(youtubeSrc || streamUrl || loadingPlayback);
 
+  function playNext() {
+    if (nextHref) router.push(nextHref);
+  }
+
+  async function shareEpisode() {
+    const url = window.location.href;
+    const payload = {
+      title: episode.title,
+      text: episode.title,
+      url,
+    };
+    try {
+      if (typeof navigator.share === "function") {
+        await navigator.share(payload);
+        return;
+      }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      if (shareTimer.current) window.clearTimeout(shareTimer.current);
+      setShareLabel("Copied");
+      shareTimer.current = window.setTimeout(() => setShareLabel("Share"), 2000);
+    } catch {
+      window.prompt("Copy this link", url);
+    }
+  }
+
   return (
     <div className="flex h-full flex-col">
       <div className="relative rounded-2xl bg-black">
         <div className="relative aspect-video overflow-hidden rounded-2xl">
-          {youtubeSrc ? (
-            <iframe
-              src={youtubeSrc}
+          {youtubeId ? (
+            <YoutubePlayer
+              videoId={youtubeId}
               title={episode.title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="absolute inset-0 h-full w-full"
+              autoPlay={autoPlayNext}
+              onEnded={nextHref ? playNext : undefined}
             />
           ) : streamUrl ? (
             <HlsPlayer
               src={streamUrl}
               poster={episode.image}
+              autoPlay={continueAutoplay || autoPlayNext}
+              onReady={() => setContinueAutoplay(true)}
+              onEnded={nextHref ? playNext : undefined}
               className="absolute inset-0 h-full w-full object-cover"
             />
           ) : (
@@ -145,26 +379,18 @@ export function ReplayPlayer({ episode }: { episode: ReplayEpisode }) {
           </div>
           <button
             type="button"
-            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-white/15 bg-[#1a1a1a] px-3 py-2 text-sm font-medium text-white hover:border-white/30 sm:px-4"
+            onClick={() => void shareEpisode()}
+            className="btn-glass-dark inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-white sm:px-4"
           >
             <IconShare className="h-4 w-4" />
-            Share
+            {shareLabel}
           </button>
         </div>
       </div>
 
       <div className="mt-5 rounded-xl bg-[#161616] p-5">
         <h2 className="text-sm font-bold text-white">About this broadcast</h2>
-        <p className={`mt-2 text-sm leading-7 text-zinc-400 ${expanded ? "" : "line-clamp-3"}`}>
-          {episode.about}
-        </p>
-        <button
-          type="button"
-          onClick={() => setExpanded((value) => !value)}
-          className="mt-2 text-sm font-semibold text-brand"
-        >
-          {expanded ? "Show less" : "Show more"}
-        </button>
+        <ExpandableText text={episode.about} />
       </div>
     </div>
   );

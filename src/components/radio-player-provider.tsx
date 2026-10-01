@@ -18,13 +18,17 @@ type RadioPlayerContextValue = {
   play: () => Promise<void>;
   pause: () => void;
   toggle: () => Promise<void>;
+  playStation: (station: RadioStation) => Promise<void>;
 };
 
 const RadioPlayerContext = createContext<RadioPlayerContextValue | null>(null);
 
-function playableStreamUrl(streamUrl: string) {
+function playableStreamUrl(streamUrl: string, stationId?: string) {
   if (!streamUrl) return "";
-  if (streamUrl.startsWith("http://")) return "/api/radio";
+  if (streamUrl.startsWith("http://")) {
+    const query = stationId ? `?s=${encodeURIComponent(stationId)}` : "";
+    return `/api/radio${query}`;
+  }
   return streamUrl;
 }
 
@@ -37,7 +41,8 @@ export function RadioPlayerProvider({
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
-  const src = playableStreamUrl(station?.streamUrl || "");
+  const [current, setCurrent] = useState<RadioStation | null>(station);
+  const src = playableStreamUrl(current?.streamUrl || "", current?.id);
   const srcRef = useRef(src);
   srcRef.current = src;
 
@@ -73,6 +78,12 @@ export function RadioPlayerProvider({
     await audio.play().catch(() => undefined);
   }, []);
 
+  const playStation = useCallback(async (next: RadioStation) => {
+    setCurrent(next);
+    srcRef.current = playableStreamUrl(next.streamUrl, next.id);
+    await play();
+  }, [play]);
+
   const toggle = useCallback(async () => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -84,8 +95,8 @@ export function RadioPlayerProvider({
   }, [play]);
 
   const value = useMemo(
-    () => ({ station, playing, play, pause, toggle }),
-    [station, playing, play, pause, toggle],
+    () => ({ station: current, playing, play, pause, toggle, playStation }),
+    [current, playing, play, pause, toggle, playStation],
   );
 
   return <RadioPlayerContext.Provider value={value}>{children}</RadioPlayerContext.Provider>;

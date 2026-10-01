@@ -13,6 +13,7 @@ type HlsPlayerProps = {
   live?: boolean;
   onReady?: () => void;
   onError?: (message: string) => void;
+  onEnded?: () => void;
   ref?: React.Ref<HTMLVideoElement>;
 };
 
@@ -32,13 +33,16 @@ export function HlsPlayer({
   live = false,
   onReady,
   onError,
+  onEnded,
   ref,
 }: HlsPlayerProps) {
   const localRef = useRef<HTMLVideoElement | null>(null);
   const onReadyRef = useRef(onReady);
   const onErrorRef = useRef(onError);
+  const onEndedRef = useRef(onEnded);
   onReadyRef.current = onReady;
   onErrorRef.current = onError;
+  onEndedRef.current = onEnded;
 
   useEffect(() => {
     const video = localRef.current;
@@ -58,7 +62,9 @@ export function HlsPlayer({
     };
     video.addEventListener("waiting", resume);
     const onVideoError = () => fail(video.error?.message || "Live stream unavailable");
+    const ended = () => onEndedRef.current?.();
     video.addEventListener("error", onVideoError);
+    video.addEventListener("ended", ended);
 
     if (Hls.isSupported() && src.includes(".m3u8")) {
       const instance = new Hls({
@@ -98,6 +104,7 @@ export function HlsPlayer({
         video.removeEventListener("loadeddata", ready);
         video.removeEventListener("waiting", resume);
         video.removeEventListener("error", onVideoError);
+        video.removeEventListener("ended", ended);
         instance.destroy();
       };
     }
@@ -110,6 +117,7 @@ export function HlsPlayer({
         video.removeEventListener("loadeddata", ready);
         video.removeEventListener("waiting", resume);
         video.removeEventListener("error", onVideoError);
+        video.removeEventListener("ended", ended);
       };
     }
 
@@ -119,6 +127,7 @@ export function HlsPlayer({
       video.removeEventListener("loadeddata", ready);
       video.removeEventListener("waiting", resume);
       video.removeEventListener("error", onVideoError);
+      video.removeEventListener("ended", ended);
     };
   }, [src, autoPlay, live]);
 

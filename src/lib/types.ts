@@ -57,6 +57,7 @@ export type Episode = {
   category: string;
   duration: string;
   href: string;
+  image?: string;
 };
 
 export type ProgramSlot = {
@@ -99,6 +100,7 @@ export type CatalogFilter = {
 };
 
 export type RadioStation = {
+  id: string;
   title: string;
   description: string;
   streamUrl: string;

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
+import { LocaleProvider } from "@/components/locale-provider";
 import { PersistentRadioBar } from "@/components/players";
 import { RadioPlayerProvider } from "@/components/radio-player-provider";
 import { getLiveRadioStation } from "@/lib/api/tve";
@@ -35,10 +36,12 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col overflow-x-hidden">
         <RadioPlayerProvider station={station}>
-          {children}
-          <Suspense>
-            <PersistentRadioBar />
-          </Suspense>
+          <LocaleProvider>
+            {children}
+            <Suspense>
+              <PersistentRadioBar />
+            </Suspense>
+          </LocaleProvider>
         </RadioPlayerProvider>
       </body>
     </html>

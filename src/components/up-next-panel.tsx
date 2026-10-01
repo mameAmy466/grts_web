@@ -1,22 +1,32 @@
 "use client";
 
-import { useState } from "react";
 import { AutoplayToggle } from "@/components/replay-player";
 import { UpNextRow } from "@/components/replay-video-card";
 import type { ReplayEpisode } from "@/lib/types";
 
-export function UpNextPanel({ episodes }: { episodes: ReplayEpisode[] }) {
-  const [autoplay, setAutoplay] = useState(true);
+export function UpNextPanel({
+  episodes,
+  playingId,
+  autoplay,
+  onAutoplayChange,
+}: {
+  episodes: ReplayEpisode[];
+  playingId?: string;
+  autoplay?: boolean;
+  onAutoplayChange?: (value: boolean) => void;
+}) {
+  const upcoming = episodes.filter((episode) => episode.id !== playingId);
+  const showAutoplay = Boolean(onAutoplayChange) && upcoming.length > 0;
 
   return (
-    <aside className="flex h-full min-h-0 w-full flex-1 flex-col rounded-xl border border-white/10 bg-[#141414] p-4">
+    <aside className="flex h-full min-h-0 w-full flex-1 flex-col rounded-xl bg-[#141414] p-4">
       <div className="mb-4 flex shrink-0 items-center justify-between">
         <h2 className="text-lg font-bold text-white">Up Next</h2>
-        <AutoplayToggle enabled={autoplay} onChange={setAutoplay} />
+        {showAutoplay ? <AutoplayToggle enabled={autoplay ?? false} onChange={onAutoplayChange!} /> : null}
       </div>
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto">
         {episodes.map((episode) => (
-          <UpNextRow key={episode.id} episode={episode} />
+          <UpNextRow key={episode.id} episode={episode} playing={episode.id === playingId} />
         ))}
       </div>
     </aside>

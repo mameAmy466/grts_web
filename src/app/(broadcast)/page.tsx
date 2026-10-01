@@ -100,7 +100,7 @@ export default async function HomePage() {
       {popularVideos.length ? (
         <SiteWrap>
           <SectionHeading title="Most popular videos" href="/programmes" />
-          <div className="grid grid-cols-2 justify-start gap-3 sm:grid-cols-[repeat(auto-fill,minmax(200px,267px))] sm:gap-2">
+          <div className="grid w-full grid-cols-2 items-stretch justify-items-stretch gap-3 md:grid-cols-4 md:gap-4">
             {popularVideos.map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}

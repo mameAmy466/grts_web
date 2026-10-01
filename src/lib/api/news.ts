@@ -164,24 +164,39 @@ export async function getNewsPosts(options?: {
   perPage?: number;
   categorySlug?: string;
   slug?: string;
+  search?: string;
 }) {
   const perPage = options?.perPage ?? 12;
   const categorySlug = options?.categorySlug ?? "";
   const slug = options?.slug ?? "";
+  const search = options?.search?.trim() ?? "";
 
   try {
+    if (search) {
+      const payload = await fetchNewsPayload({
+        per_page: perPage,
+        ...(categorySlug ? { category_slug: categorySlug } : {}),
+        search,
+      });
+      if (!payload) return [];
+      return allItems<TveNewsPost>(payload)
+        .slice(0, perPage)
+        .map((post) => postToArticle(post, categorySlug || undefined, Boolean(slug)));
+    }
+
     return await unstable_cache(
       async () => {
         const payload = await fetchNewsPayload({
           per_page: perPage,
           ...(categorySlug ? { category_slug: categorySlug } : {}),
           ...(slug ? { slug } : {}),
+          ...(search ? { search } : {}),
         });
         if (!payload) return [];
         const posts = allItems<TveNewsPost>(payload).slice(0, perPage);
         return posts.map((post) => postToArticle(post, categorySlug || undefined, Boolean(slug)));
       },
-      ["tve-news-posts", TVE_APP_SLUG, String(perPage), categorySlug, slug],
+      ["tve-news-posts", TVE_APP_SLUG, String(perPage), categorySlug, slug, search],
       { revalidate: REVALIDATE_CATEGORY },
     )();
   } catch {

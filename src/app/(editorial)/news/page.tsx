@@ -4,7 +4,6 @@ import { BreakingTicker } from "@/components/breaking-ticker";
 import { NewsGridCard } from "@/components/cards";
 import { socialIcons } from "@/components/icons";
 import { MediaImage, SiteWrap } from "@/components/media-image";
-import { StayConnectedCard } from "@/components/stay-connected-card";
 import {
   editorsChoice,
   followerStats,
@@ -165,7 +164,6 @@ export default async function NewsPage() {
                 })}
               </div>
             </div>
-            <StayConnectedCard />
             <div>
               <h3 className="text-sm font-bold text-zinc-900">Most Viewed</h3>
               <ol className="mt-3 flex flex-col gap-3">

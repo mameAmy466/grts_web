@@ -61,6 +61,8 @@ type TveShow = {
   time?: string;
   chaine_name?: string;
   feed_url?: string;
+  video_url?: string | null;
+  type?: string;
 };
 
 type TveAndroidItem = {
@@ -74,6 +76,7 @@ type TveCategoryGroup = {
   list_categories_by_group?: string;
   list_shows_by_group?: string;
   categories_with_video_by_group?: string;
+  categories_with_show_by_group?: string;
 };
 
 type TvePaged<T> = {
@@ -103,7 +106,7 @@ type TveVideo = {
   logo_url?: string;
   slug?: string;
   date?: string;
-  time?: string;
+  time?: string | number;
   views?: string;
   feed_url?: string;
   webdetail_url?: string;
@@ -142,8 +145,13 @@ function tveUrl(...parts: Array<string | number>) {
   return `${TVE_API_BASE}/${parts.join("/")}`;
 }
 
-function videoClock(time?: string) {
-  return isRealDuration(time) ? formatClockDuration(durationToSeconds(time!)) : "";
+function tveMediaUrl(value?: string | null) {
+  if (!value || value === "null") return "";
+  return value.replace(/^http:\/\//i, "https://");
+}
+
+function videoClock(time?: string | number) {
+  return isRealDuration(time) ? formatClockDuration(durationToSeconds(time)) : "";
 }
 
 function videoPoster(item: Pick<TveVideo, "logo" | "logo_url" | "video_url">) {
@@ -167,7 +175,7 @@ async function youtubeMetaMap(urls: Array<string | undefined>) {
 
   for (let index = 0; index < ids.length; index += 50) {
     const chunk = ids.slice(index, index + 50);
-    const url = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics,snippet&id=${chunk.join(",")}&key=${encodeURIComponent(key)}`;
+    const url = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics,snippet&id=${chunk.map(encodeURIComponent).join(",")}&key=${encodeURIComponent(key)}`;
     try {
       const response = await fetch(url, { next: { revalidate: 86400 } });
       if (!response.ok) continue;
@@ -243,6 +251,7 @@ export async function getLiveRadioStation(): Promise<RadioStation | null> {
   const radio = (await getLiveRadios())[0];
   if (!radio) return null;
   return {
+    id: radio.slug || radio.title || "grts-radio",
     title: radio.title || "GRTS Radio",
     description: radio.desc || "National Radio - Gambia",
     streamUrl: radio.stream_url || "",
@@ -251,7 +260,7 @@ export async function getLiveRadioStation(): Promise<RadioStation | null> {
 }
 
 export function programEpisodeFeed(program?: Pick<Program, "videoFeedUrl" | "feedUrl"> | null) {
-  return program?.videoFeedUrl || program?.feedUrl;
+  return program?.feedUrl || program?.videoFeedUrl;
 }
 
 export function programAsEpisode(program: Program): ReplayEpisode {
@@ -330,18 +339,28 @@ async function getVideosForCategory(category: TveVodCategory) {
   const videos = [...(category.subitems?.data ?? [])];
   let url = nextPageUrl(category.subitems?.pagination?.next_page_url);
 
-  for (let page = 0; url && page < 12; page += 1) {
+  for (let page = 0; url && page < 20; page += 1) {
     const payload = await fetchCategoryGridPage(url);
     if (!payload) break;
-    const next = allItems<TveVodCategory>(payload).find((item) => item.slug === category.slug)
-      ?? allItems<TveVodCategory>(payload)[0];
-    videos.push(...(next?.subitems?.data ?? []));
-    url = nextPageUrl(next?.subitems?.pagination?.next_page_url);
+    const next = allItems<TveVodCategory>(payload).find(
+      (item) => item.slug === category.slug || item.id === category.id,
+    );
+    if (!next) break;
+    videos.push(...(next.subitems?.data ?? []));
+    url = nextPageUrl(next.subitems?.pagination?.next_page_url);
+  }
+
+  if (category.video_feed_url) {
+    try {
+      videos.push(...allItems<TveVideo>(await getJson(category.video_feed_url, REVALIDATE_STATIC)));
+    } catch {
+      // keep grid videos
+    }
   }
 
   const seen = new Set<string>();
   return videos.filter((video) => {
-    const key = video.slug || slugify(video.title);
+    const key = slugify(video.slug || video.title);
     if (!video.title || !key || seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -351,42 +370,76 @@ async function getVideosForCategory(category: TveVodCategory) {
 function uniquePrograms(programmes: Program[]) {
   const seen = new Set<string>();
   return programmes.filter((program) => {
-    if (seen.has(program.slug)) return false;
-    seen.add(program.slug);
+    const key = slugify(program.slug || program.title);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
     return true;
   });
+}
+
+async function getShowsByGroupUrl() {
+  return `${tveUrl("listChannelsbygroup", TVE_APP_SLUG, "json")}`;
+}
+
+async function getShowsWithCategoryUrl() {
+  try {
+    const menu = await getAndroidItem("CATEGORIES VOD");
+    if (menu?.feed_url) {
+      const groups = allItems<TveCategoryGroup>(await getJson(menu.feed_url, REVALIDATE_STATIC));
+      const url = groups[0]?.categories_with_show_by_group;
+      if (url) return url;
+    }
+  } catch {
+    // fall through
+  }
+  return `${tveUrl("listChannelsCategoriesByGroup", TVE_APP_SLUG, "json")}?display=grid&subitems_type=shows`;
+}
+
+async function loadShows(): Promise<TveShow[]> {
+  try {
+    const shows = allItems<TveShow>(await getJson(await getShowsByGroupUrl(), REVALIDATE_STATIC));
+    return shows.filter((show) => show.title && slugify(show.slug || show.title));
+  } catch {
+    return [];
+  }
+}
+
+async function loadShowCategoryMap() {
+  const map = new Map<string, TveVodCategory>();
+  let url: string | null = await getShowsWithCategoryUrl();
+  for (let page = 0; url && page < 8; page += 1) {
+    const payload = await fetchCategoryGridPage(url);
+    if (!payload) break;
+    for (const category of allItems<TveVodCategory>(payload)) {
+      for (const show of category.subitems?.data ?? []) {
+        const slug = slugify(show.slug || show.title);
+        if (slug && !map.has(slug)) map.set(slug, category);
+      }
+    }
+    url = nextPageUrl(payload.pagination?.next_page_url);
+  }
+  return map;
 }
 
 async function loadProgramCatalog(): Promise<{
   categories: CatalogFilter[];
   programmes: Program[];
 }> {
-  const startUrl = await getCategoriesWithVideoUrl();
-  const categories = await getAllCategoryPages(startUrl);
-  const grouped = await Promise.all(
-    categories.map(async (category) => ({
-      category,
-      videos: await getVideosForCategory(category),
-    })),
+  const [shows, categoryMap] = await Promise.all([loadShows(), loadShowCategoryMap()]);
+  const programmes = uniquePrograms(
+    shows.map((show) => {
+      const slug = slugify(show.slug || show.title);
+      return showToProgram(show, categoryMap.get(slug));
+    }),
   );
-  const filled = grouped.filter(({ videos }) => videos.length > 0);
-  const meta = await youtubeMetaMap(
-    filled.flatMap(({ videos }) => videos.filter((video) => !isRealDuration(video.time)).map((video) => video.video_url)),
-  );
-
-  return {
-    categories: filled.map(({ category }) => ({
-      id: category.slug || slugify(category.title),
-      label: category.title,
-    })),
-    programmes: filled.flatMap(({ category, videos }) =>
-      videos.map((video) => {
-        const fromApi = videoClock(video.time);
-        const fromYoutube = meta.get(youtubeVideoId(video.video_url));
-        return videoToProgram({ ...video, time: fromApi || fromYoutube?.duration || video.time }, category);
-      }),
-    ),
-  };
+  const seen = new Set<string>();
+  const categories: CatalogFilter[] = [];
+  for (const program of programmes) {
+    if (!program.filter || seen.has(program.filter)) continue;
+    seen.add(program.filter);
+    categories.push({ id: program.filter, label: program.badge });
+  }
+  return { categories, programmes };
 }
 
 export async function getTveProgramCatalog(): Promise<{
@@ -394,9 +447,15 @@ export async function getTveProgramCatalog(): Promise<{
   programmes: Program[];
 }> {
   try {
-    return await unstable_cache(loadProgramCatalog, ["tve-program-catalog-duration", TVE_APP_SLUG], {
+    const cached = await unstable_cache(loadProgramCatalog, ["tve-program-catalog-shows-v2", TVE_APP_SLUG], {
       revalidate: REVALIDATE_STATIC,
     })();
+    if (cached.programmes.length) return cached;
+  } catch {
+    // load live below
+  }
+  try {
+    return await loadProgramCatalog();
   } catch {
     return { categories: [], programmes: [] };
   }
@@ -407,19 +466,42 @@ export async function getTveShows(): Promise<Program[]> {
   return uniquePrograms(programmes);
 }
 
+function programMatchesSlug(program: Pick<Program, "slug" | "title">, needle: string) {
+  return slugify(program.slug) === needle || slugify(program.title) === needle;
+}
+
+async function findProgramInGrid(needle: string) {
+  const [shows, categoryMap] = await Promise.all([loadShows(), loadShowCategoryMap()]);
+  const show = shows.find((item) => programMatchesSlug({ slug: item.slug || "", title: item.title }, needle));
+  if (!show) return null;
+  return showToProgram(show, categoryMap.get(needle) ?? categoryMap.get(slugify(show.slug || show.title)));
+}
+
 export async function getTveShow(slug: string) {
-  const shows = await getTveShows();
-  return shows.find((show) => show.slug === slug) ?? null;
+  const needle = slugify(decodeURIComponent(slug || "").trim());
+  if (!needle) return null;
+  const fromGrid = await findProgramInGrid(needle);
+  if (fromGrid) return fromGrid;
+  const { programmes } = await getTveProgramCatalog();
+  return programmes.find((show) => programMatchesSlug(show, needle)) ?? null;
 }
 
 export async function getTveEpisodes(feedUrl?: string, programSlug = ""): Promise<ReplayEpisode[]> {
-  if (!feedUrl) return [];
+  let url = nextPageUrl(feedUrl);
+  if (!url) return [];
+  const raw: TveVideo[] = [];
   try {
-    const videos = await withYoutubeDurations(allItems<TveVideo>(await getJson(feedUrl, REVALIDATE_STATIC)));
-    return videos.map((item) => videoToReplay(item, programSlug));
+    for (let page = 0; url && page < 8; page += 1) {
+      const payload = await getJsonUncached<TvePaged<TveVideo>>(url);
+      if (!payload) break;
+      raw.push(...allItems<TveVideo>(payload).filter((item) => item.title));
+      url = nextPageUrl(payload.pagination?.next_page_url);
+    }
   } catch {
-    return [];
+    if (!raw.length) return [];
   }
+  const videos = await withYoutubeDurations(raw).catch(() => raw);
+  return videos.map((item) => videoToReplay(item, programSlug));
 }
 
 export async function getTveSliders(): Promise<VideoItem[]> {
@@ -585,19 +667,19 @@ export async function getTveGuideSlots(): Promise<ProgramSlot[]> {
 }
 
 function videoToProgram(video: TveVideo, category: TveVodCategory): Program {
-  const slug = video.slug || slugify(video.title);
+  const slug = slugify(video.slug || video.title);
   return {
     id: slug,
     slug,
-    title: video.title,
-    badge: category.title,
-    badgeColor: colorFromLabel(category.title),
-    filter: category.slug || slugify(category.title),
-    schedule: formatDisplayDate(video.date) || category.title,
+    title: String(video.title || slug),
+    badge: String(category.title || "GRTS TV"),
+    badgeColor: colorFromLabel(String(category.title || "GRTS TV")),
+    filter: slugify(category.slug || category.title) || "all",
+    schedule: formatDisplayDate(video.date ? String(video.date) : "") || String(category.title || ""),
     duration: videoClock(video.time),
     image: videoPoster(video),
     poster: videoPoster(video),
-    description: video.desc || video.title,
+    description: String(video.desc || video.title || ""),
     feedUrl: video.webdetail_url || video.feed_url,
     videoFeedUrl: category.video_feed_url,
     streamUrl: video.video_url,
@@ -605,29 +687,31 @@ function videoToProgram(video: TveVideo, category: TveVodCategory): Program {
 }
 
 function showToProgram(show: TveShow, category?: TveVodCategory): Program {
-  const badge = category?.title || show.chaine_name || "GRTS TV";
+  const badge = category?.title || "";
   const filter = category?.slug || slugify(badge);
+  const image = tveMediaUrl(show.poster) || tveMediaUrl(show.logo_url) || tveMediaUrl(show.logo);
   return {
-    id: show.slug || slugify(show.title),
-    slug: show.slug || slugify(show.title),
+    id: slugify(show.slug || show.title),
+    slug: slugify(show.slug || show.title),
     title: show.title,
     badge,
-    badgeColor: colorFromLabel(badge),
+    badgeColor: badge ? colorFromLabel(badge) : "#e31c23",
     filter,
-    schedule: category?.title || show.chaine_name || "GRTS TV",
-    image: show.poster || show.logo_url || show.logo || "",
-    poster: show.poster || show.logo_url || show.logo,
-    description: show.desc || `${show.title} on GRTS TV.`,
-    feedUrl: show.feed_url,
-    videoFeedUrl: category?.video_feed_url,
+    schedule: "",
+    image,
+    poster: image,
+    description: show.desc?.trim() || "",
+    feedUrl: tveMediaUrl(show.feed_url),
+    streamUrl: tveMediaUrl(show.video_url),
   };
 }
 
 function videoToReplay(item: TveVideo, programSlug: string): ReplayEpisode {
-  const slug = item.slug || slugify(item.title);
+  const slug = slugify(item.slug || item.title);
+  const showSlug = programSlug || slug;
   return {
     id: slug,
-    programSlug: programSlug || slug,
+    programSlug: showSlug,
     title: item.title,
     category: item.chaine_name || "",
     published: formatDisplayDate(item.date),
@@ -637,8 +721,9 @@ function videoToReplay(item: TveVideo, programSlug: string): ReplayEpisode {
     durationSeconds: durationToSeconds(item.time || ""),
     image: videoPoster(item),
     about: item.desc || item.title,
-    streamFeedUrl: item.feed_url || item.webdetail_url,
-    streamUrl: item.video_url,
+    streamFeedUrl: nextPageUrl(item.feed_url || item.webdetail_url),
+    streamUrl: tveMediaUrl(item.video_url),
+    href: `/programmes/${showSlug}/watch?e=${slug}`,
   };
 }
 

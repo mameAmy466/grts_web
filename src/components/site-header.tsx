@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/logo";
 import {
   IconChevronDown,
@@ -13,29 +13,13 @@ import {
   IconSearch,
   socialIcons,
 } from "@/components/icons";
+import { LOCALES, useLocale } from "@/components/locale-provider";
+import { SiteSearch } from "@/components/site-search";
 import { SITE, socialLinks } from "@/lib/data";
 import type { ChromeTheme } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 type NewsNavItem = { slug: string; label: string };
-
-const nav = [
-  { href: "/", label: "Home" },
-  { href: "/live", label: "Live" },
-  { href: "/programmes", label: "TV programs" },
-  { href: "/news", label: "News", children: true },
-  { href: "/about", label: "About" },
-];
-
-const mobileNav = [
-  { href: "/", label: "Home" },
-  { href: "/live", label: "Live TV" },
-  { href: "/radio", label: "Radio" },
-  { href: "/programmes", label: "TV programs" },
-  { href: "/shorts", label: "Shorts" },
-  { href: "/news", label: "News", children: true },
-  { href: "/about", label: "About" },
-];
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
@@ -54,10 +38,33 @@ export function SiteHeader({
   newsCategories?: NewsNavItem[];
 }) {
   const pathname = usePathname();
+  const { locale, setLocale, t } = useLocale();
   const [open, setOpen] = useState(false);
   const [newsOpen, setNewsOpen] = useState(false);
   const [mobileNewsOpen, setMobileNewsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const langRef = useRef<HTMLDivElement>(null);
   const light = theme === "light";
+  const currentLang = LOCALES.find((item) => item.code === locale) ?? LOCALES[0];
+
+  const nav = [
+    { href: "/", label: t("navHome") },
+    { href: "/live", label: t("navLive") },
+    { href: "/programmes", label: t("navPrograms") },
+    { href: "/news", label: t("navNews"), children: true },
+    { href: "/about", label: t("navAbout") },
+  ];
+
+  const mobileNav = [
+    { href: "/", label: t("navHome") },
+    { href: "/live", label: t("navLiveTv") },
+    { href: "/radio", label: t("navRadio") },
+    { href: "/programmes", label: t("navPrograms") },
+    { href: "/shorts", label: t("navShorts") },
+    { href: "/news", label: t("navNews"), children: true },
+    { href: "/about", label: t("navAbout") },
+  ];
 
   useEffect(() => {
     if (!open) return;
@@ -67,6 +74,22 @@ export function SiteHeader({
       document.body.style.overflow = previous;
     };
   }, [open]);
+
+  useEffect(() => {
+    if (!langOpen) return;
+    function onPointer(event: MouseEvent) {
+      if (!langRef.current?.contains(event.target as Node)) setLangOpen(false);
+    }
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") setLangOpen(false);
+    }
+    window.addEventListener("mousedown", onPointer);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("mousedown", onPointer);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [langOpen]);
 
   return (
     <header
@@ -91,7 +114,7 @@ export function SiteHeader({
               <IconPhone className="h-3.5 w-3.5" />
               {SITE.phone}
             </a>
-            <a href={`mailto:${SITE.email}`} className="hidden items-center gap-1.5 sm:inline-flex hover:text-brand">
+            <a href={`mailto:${SITE.email}`} className="hidden items-center gap-1.5 hover:text-brand sm:inline-flex">
               <IconMail className="h-3.5 w-3.5" />
               {SITE.email}
             </a>
@@ -192,7 +215,13 @@ export function SiteHeader({
           <div className="flex h-6 w-[85px] items-center gap-6">
             <button
               type="button"
-              aria-label="Search"
+              aria-label={t("search")}
+              aria-expanded={searchOpen}
+              onClick={() => {
+                setLangOpen(false);
+                setOpen(false);
+                setSearchOpen(true);
+              }}
               className={cn(
                 "flex h-6 w-5 shrink-0 items-center justify-center hover:text-brand",
                 light ? "text-zinc-800" : "text-white",
@@ -200,20 +229,60 @@ export function SiteHeader({
             >
               <IconSearch className="h-5 w-5" />
             </button>
-            <button
-              type="button"
-              className={cn(
-                "inline-flex h-6 w-[41px] shrink-0 items-center justify-center rounded-[4px] border px-3 py-1.5 text-[11px] font-semibold leading-none hover:border-brand hover:text-brand",
-                light ? "border-zinc-300 text-zinc-800" : "border-white/20 text-white",
-              )}
-            >
-              EN
-            </button>
+            <div ref={langRef} className="relative">
+              <button
+                type="button"
+                aria-label={t("language")}
+                aria-haspopup="listbox"
+                aria-expanded={langOpen}
+                onClick={() => {
+                  setSearchOpen(false);
+                  setLangOpen((value) => !value);
+                }}
+                className={cn(
+                  "inline-flex h-6 w-[41px] shrink-0 items-center justify-center rounded-[4px] px-3 py-1.5 text-[11px] font-semibold leading-none hover:text-brand",
+                  light ? "btn-glass text-zinc-800" : "btn-glass-dark text-white",
+                )}
+              >
+                {currentLang.short}
+              </button>
+              {langOpen ? (
+                <div
+                  role="listbox"
+                  className={cn(
+                    "absolute right-0 top-full z-50 mt-2 w-36 overflow-hidden rounded-lg border py-1 shadow-xl",
+                    light
+                      ? "border-zinc-200 bg-white text-zinc-800"
+                      : "border-white/10 bg-[#171717] text-white",
+                  )}
+                >
+                  {LOCALES.map((item) => (
+                    <button
+                      key={item.code}
+                      type="button"
+                      role="option"
+                      aria-selected={item.code === locale}
+                      onClick={() => {
+                        setLocale(item.code);
+                        setLangOpen(false);
+                      }}
+                      className={cn(
+                        "flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:text-brand",
+                        item.code === locale && "text-brand",
+                      )}
+                    >
+                      <span>{item.name}</span>
+                      <span className="text-[11px] font-semibold">{item.short}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </div>
           <button
             type="button"
             className="lg:hidden"
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={open ? t("closeMenu") : t("openMenu")}
             aria-expanded={open}
             onClick={() => setOpen((value) => !value)}
           >
@@ -226,7 +295,7 @@ export function SiteHeader({
         <div className="lg:hidden">
           <button
             type="button"
-            aria-label="Close menu"
+            aria-label={t("closeMenu")}
             className="fixed inset-x-0 bottom-0 top-[var(--site-header)] z-30 bg-black/50"
             onClick={() => setOpen(false)}
           />
@@ -258,7 +327,7 @@ export function SiteHeader({
                       </Link>
                       <button
                         type="button"
-                        aria-label={mobileNewsOpen ? "Hide news categories" : "Show news categories"}
+                        aria-label={mobileNewsOpen ? t("hideNews") : t("showNews")}
                         aria-expanded={mobileNewsOpen}
                         onClick={() => setMobileNewsOpen((value) => !value)}
                         className="flex h-11 w-11 items-center justify-center text-zinc-400"
@@ -281,7 +350,7 @@ export function SiteHeader({
                             pathname === "/news" ? "text-brand" : light ? "text-zinc-500" : "text-zinc-400",
                           )}
                         >
-                          All news
+                          {t("allNews")}
                         </Link>
                         {newsCategories.map((category) => (
                           <Link
@@ -321,13 +390,29 @@ export function SiteHeader({
             </div>
 
             <div className={cn("mt-2 px-4 pb-6 pt-3", light ? "bg-zinc-50" : "bg-black/20")}>
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-4 flex items-center justify-between gap-3">
                 <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                  Language
+                  {t("language")}
                 </span>
-                <span className="btn-glass inline-flex h-8 items-center rounded-full px-3 text-xs font-semibold text-brand">
-                  EN
-                </span>
+                <div className="flex gap-1">
+                  {LOCALES.map((item) => (
+                    <button
+                      key={item.code}
+                      type="button"
+                      onClick={() => setLocale(item.code)}
+                      className={cn(
+                        "inline-flex h-8 min-w-8 items-center justify-center rounded-full px-3 text-xs font-semibold",
+                        item.code === locale
+                          ? "bg-brand text-white"
+                          : light
+                            ? "bg-zinc-200 text-zinc-700"
+                            : "btn-glass text-zinc-300",
+                      )}
+                    >
+                      {item.short}
+                    </button>
+                  ))}
+                </div>
               </div>
               <div className={cn("flex flex-col gap-2 text-sm", light ? "text-zinc-600" : "text-zinc-400")}>
                 <a href={`tel:${SITE.phone.replace(/\s/g, "")}`} className="inline-flex items-center gap-2 hover:text-brand">
@@ -363,6 +448,8 @@ export function SiteHeader({
           </nav>
         </div>
       ) : null}
+
+      <SiteSearch open={searchOpen} onClose={() => setSearchOpen(false)} theme={theme} />
     </header>
   );
 }
