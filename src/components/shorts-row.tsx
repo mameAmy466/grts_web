@@ -63,7 +63,7 @@ export function ShortsRow({ items }: { items: ShortItem[] }) {
               onClick={() => go(index)}
               className={cn(
                 "h-1.5 rounded-full transition-all",
-                index === page ? "w-5 bg-brand" : "w-1.5 bg-white/30 hover:bg-white/50",
+                index === page ? "w-5 bg-brand" : "w-1.5 bg-fg/30 hover:bg-fg/50",
               )}
             />
           ))}

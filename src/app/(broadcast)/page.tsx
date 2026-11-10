@@ -64,10 +64,10 @@ export default async function HomePage() {
       </SiteWrap>
 
       <SiteWrap className="pb-10 sm:pb-12">
-        <div className="flex h-auto w-full flex-col justify-between gap-5 rounded-3xl border-x-0 border-y border-[var(--color-bg-primary,#0A0A0A)] bg-[var(--color-surface-default,#171717)] px-4 py-6 sm:h-[140px] sm:flex-row sm:items-center sm:gap-8 sm:px-10 sm:py-0">
+        <div className="flex h-auto w-full flex-col justify-between gap-5 rounded-3xl border-x-0 border-y border-line bg-[var(--color-surface-default,#171717)] px-4 py-6 sm:h-[140px] sm:flex-row sm:items-center sm:gap-8 sm:px-10 sm:py-0">
           <div className="min-w-0">
             <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-brand">YOUR AD HERE</p>
-            <p className="mt-1 text-xl font-bold leading-tight text-zinc-200">Promote your brand on GRTS</p>
+            <p className="mt-1 text-xl font-bold leading-tight text-fg-soft">Promote your brand on GRTS</p>
             <p className="mt-1 text-sm text-zinc-500">
               TV, digital, and sponsorships — join our national audience.
             </p>
@@ -83,7 +83,7 @@ export default async function HomePage() {
       </SiteWrap>
 
       {replayVideos.length ? (
-        <section className="bg-[#111] py-8 md:py-12">
+        <section className="bg-surface py-8 md:py-12">
           <SiteWrap>
             <WatchAgain videos={replayVideos} />
           </SiteWrap>

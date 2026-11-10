@@ -6,18 +6,15 @@ import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { IconClose, IconSearch } from "@/components/icons";
 import { useLocale } from "@/components/locale-provider";
 import { emptySearch, searchHasHits, type SearchResults } from "@/lib/search";
-import type { ChromeTheme } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 function ResultGroup({
   title,
   items,
-  light,
   onPick,
 }: {
   title: string;
   items: SearchResults["news"];
-  light: boolean;
   onPick: () => void;
 }) {
   if (!items.length) return null;
@@ -30,10 +27,7 @@ function ResultGroup({
             <Link
               href={item.href}
               onClick={onPick}
-              className={cn(
-                "block rounded-md px-3 py-2 hover:text-brand",
-                light ? "hover:bg-zinc-100" : "hover:bg-white/5",
-              )}
+              className="block rounded-md px-3 py-2 hover:bg-fg/5 hover:text-brand"
             >
               <span className="block text-sm font-medium">{item.title}</span>
               {item.meta ? <span className="mt-0.5 block text-xs text-zinc-500">{item.meta}</span> : null}
@@ -48,17 +42,14 @@ function ResultGroup({
 export function SiteSearch({
   open,
   onClose,
-  theme = "dark",
 }: {
   open: boolean;
   onClose: () => void;
-  theme?: ChromeTheme;
 }) {
   const router = useRouter();
   const { t } = useLocale();
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
-  const light = theme === "light";
   const [query, setQuery] = useState("");
   const [fetched, setFetched] = useState<SearchResults>(emptySearch());
   const [loading, setLoading] = useState(false);
@@ -132,7 +123,7 @@ export function SiteSearch({
         <div
           className={cn(
             "overflow-hidden rounded-2xl border shadow-2xl",
-            light ? "border-zinc-200 bg-white text-zinc-900" : "border-white/10 bg-[#171717] text-white",
+            "border-line bg-card text-fg",
           )}
         >
           <form onSubmit={submit} className="flex items-center gap-2 border-b border-inherit px-3 py-2">
@@ -147,10 +138,7 @@ export function SiteSearch({
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={t("searchPlaceholder")}
-              className={cn(
-                "h-11 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-500",
-                light ? "text-zinc-900" : "text-white",
-              )}
+              className="h-11 min-w-0 flex-1 bg-transparent text-sm text-fg outline-none placeholder:text-zinc-500"
             />
             <button
               type="button"
@@ -171,11 +159,11 @@ export function SiteSearch({
               <p className="px-3 py-6 text-sm text-zinc-500">{t("searchNone")}</p>
             ) : (
               <>
-                <ResultGroup title={t("searchPages")} items={results.pages} light={light} onPick={onClose} />
-                <ResultGroup title={t("searchNews")} items={results.news} light={light} onPick={onClose} />
-                <ResultGroup title={t("searchProgrammes")} items={results.programmes} light={light} onPick={onClose} />
-                <ResultGroup title={t("searchVideos")} items={results.videos} light={light} onPick={onClose} />
-                <ResultGroup title={t("searchShorts")} items={results.shorts} light={light} onPick={onClose} />
+                <ResultGroup title={t("searchPages")} items={results.pages} onPick={onClose} />
+                <ResultGroup title={t("searchNews")} items={results.news} onPick={onClose} />
+                <ResultGroup title={t("searchProgrammes")} items={results.programmes} onPick={onClose} />
+                <ResultGroup title={t("searchVideos")} items={results.videos} onPick={onClose} />
+                <ResultGroup title={t("searchShorts")} items={results.shorts} onPick={onClose} />
                 <Link
                   href={`/search?q=${encodeURIComponent(query.trim())}`}
                   onClick={onClose}

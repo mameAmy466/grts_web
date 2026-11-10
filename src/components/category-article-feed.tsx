@@ -10,7 +10,7 @@ import { clipText, formatDisplayDate } from "@/lib/utils";
 function ArticleCard({ article }: { article: Article }) {
   return (
     <Link href={article.href} className="group block">
-      <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-zinc-200">
+      <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-skeleton">
         <MediaImage src={article.image} alt={article.title} />
       </div>
       <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
@@ -19,7 +19,7 @@ function ArticleCard({ article }: { article: Article }) {
         {formatDisplayDate(article.date)}
         {article.readTime ? ` · ${article.readTime}` : null}
       </p>
-      <h2 className="mt-1.5 line-clamp-3 break-words text-base font-bold leading-snug text-zinc-900 group-hover:text-brand">
+      <h2 className="mt-1.5 line-clamp-3 break-words text-base font-bold leading-snug text-fg group-hover:text-brand">
         {clipText(article.title, 90)}
       </h2>
     </Link>
@@ -29,10 +29,10 @@ function ArticleCard({ article }: { article: Article }) {
 function ArticleSkeleton() {
   return (
     <div className="animate-pulse">
-      <div className="aspect-[16/10] rounded-lg bg-zinc-200" />
-      <div className="mt-3 h-3 w-28 rounded bg-zinc-200" />
-      <div className="mt-2 h-4 w-full rounded bg-zinc-200" />
-      <div className="mt-2 h-4 w-3/4 rounded bg-zinc-200" />
+      <div className="aspect-[16/10] rounded-lg bg-skeleton" />
+      <div className="mt-3 h-3 w-28 rounded bg-skeleton" />
+      <div className="mt-2 h-4 w-full rounded bg-skeleton" />
+      <div className="mt-2 h-4 w-3/4 rounded bg-skeleton" />
     </div>
   );
 }

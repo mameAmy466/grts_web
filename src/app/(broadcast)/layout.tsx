@@ -10,10 +10,10 @@ export default async function BroadcastLayout({
   const newsCategories = await getNewsNav();
 
   return (
-    <div className="flex min-h-full flex-col bg-[#0a0a0a] text-white">
-      <SiteHeader theme="dark" newsCategories={newsCategories} />
+    <div className="flex min-h-full flex-col bg-page text-fg">
+      <SiteHeader newsCategories={newsCategories} />
       <main className="flex-1">{children}</main>
-      <SiteFooter theme="dark" />
+      <SiteFooter />
     </div>
   );
 }

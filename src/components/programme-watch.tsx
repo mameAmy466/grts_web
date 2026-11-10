@@ -51,10 +51,10 @@ export function ProgrammeWatch({
 
       <SiteWrap className="mt-10 md:mt-14">
         <div className="mb-5 flex items-end justify-between gap-4">
-          <h2 className="text-xl font-bold text-white md:text-2xl">Related Videos</h2>
+          <h2 className="text-xl font-bold text-fg md:text-2xl">Related Videos</h2>
           <Link
             href="/programmes"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-400 hover:text-brand"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-fg-muted hover:text-brand"
           >
             View all programs
             <IconArrowRight className="h-4 w-4" />

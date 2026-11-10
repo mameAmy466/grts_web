@@ -64,7 +64,7 @@ export function ProgrammesCatalog({
               type="button"
               aria-label="Catégories précédentes"
               onClick={() => slide(-1)}
-              className="btn-glass-dark hidden h-9 w-9 shrink-0 items-center justify-center rounded-full text-white sm:flex"
+              className="btn-chrome hidden h-9 w-9 shrink-0 items-center justify-center rounded-full text-fg sm:flex"
             >
               <IconChevronLeft className="h-4 w-4" />
             </button>
@@ -84,7 +84,7 @@ export function ProgrammesCatalog({
                     "shrink-0 snap-start rounded-full border-0 px-3.5 py-1.5 text-sm font-medium whitespace-nowrap",
                     filter === item.id
                       ? "bg-brand text-white"
-                      : "btn-glass-dark text-zinc-200 hover:text-white",
+                      : "btn-chrome text-fg-soft hover:text-fg",
                   )}
                 >
                   {item.label}
@@ -95,7 +95,7 @@ export function ProgrammesCatalog({
               type="button"
               aria-label="Catégories suivantes"
               onClick={() => slide(1)}
-              className="btn-glass-dark hidden h-9 w-9 shrink-0 items-center justify-center rounded-full text-white sm:flex"
+              className="btn-chrome hidden h-9 w-9 shrink-0 items-center justify-center rounded-full text-fg sm:flex"
             >
               <IconChevronRight className="h-4 w-4" />
             </button>
@@ -108,13 +108,13 @@ export function ProgrammesCatalog({
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search a programme"
-              className="btn-glass-dark h-10 w-full rounded-full pl-9 pr-4 text-sm text-white outline-none placeholder:text-zinc-400 focus:ring-0"
+              className="btn-chrome h-10 w-full rounded-full pl-9 pr-4 text-sm text-fg outline-none placeholder:text-fg-muted focus:ring-0"
             />
           </label>
         </div>
 
         {visible.length === 0 ? (
-          <p className="mt-16 text-center text-sm text-zinc-400">
+          <p className="mt-16 text-center text-sm text-fg-muted">
             No programme matches that search.
           </p>
         ) : (

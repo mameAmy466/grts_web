@@ -10,10 +10,10 @@ export default async function EditorialLayout({
   const newsCategories = await getNewsNav();
 
   return (
-    <div className="flex min-h-full flex-col bg-white text-zinc-900">
-      <SiteHeader theme="light" newsCategories={newsCategories} />
+    <div className="flex min-h-full flex-col bg-page text-fg">
+      <SiteHeader newsCategories={newsCategories} />
       <main className="flex-1">{children}</main>
-      <SiteFooter theme="light" />
+      <SiteFooter />
     </div>
   );
 }
