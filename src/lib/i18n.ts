@@ -48,6 +48,10 @@ const en = {
   downloadApps: "Download our apps from",
   rights: "© 2026 GRTS Gambia. All rights reserved.",
   government: "A service of the Government of The Gambia",
+  theme: "Theme",
+  themeLight: "Light",
+  themeDark: "Dark",
+  themeSystem: "System",
 };
 
 const fr: typeof en = {
@@ -90,6 +94,10 @@ const fr: typeof en = {
   downloadApps: "Télécharger nos apps",
   rights: "© 2026 GRTS Gambia. Tous droits réservés.",
   government: "Un service du gouvernement de la Gambie",
+  theme: "Thème",
+  themeLight: "Clair",
+  themeDark: "Sombre",
+  themeSystem: "Système",
 };
 
 export const messages = { en, fr };

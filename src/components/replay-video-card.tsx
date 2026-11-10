@@ -15,7 +15,7 @@ export { episodeHref };
 export function ReplayVideoCard({ episode }: { episode: ReplayEpisode }) {
   return (
     <Link href={episodeHref(episode)} className="group flex h-full w-full flex-col gap-3">
-      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-zinc-800">
+      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-skeleton">
         <MediaImage
           src={episode.image}
           alt={episode.title}
@@ -24,7 +24,7 @@ export function ReplayVideoCard({ episode }: { episode: ReplayEpisode }) {
         <Duration value={episode.duration} />
       </div>
       <div className="min-h-0">
-        <h3 className="line-clamp-2 text-sm font-bold leading-snug text-white group-hover:text-brand">
+        <h3 className="line-clamp-2 text-sm font-bold leading-snug text-fg group-hover:text-brand">
           {episode.title}
         </h3>
         <p className="mt-1 text-xs text-zinc-500">{formatDisplayDate(episode.posted)}</p>
@@ -36,7 +36,7 @@ export function ReplayVideoCard({ episode }: { episode: ReplayEpisode }) {
 export function UpNextRow({ episode, playing = false }: { episode: ReplayEpisode; playing?: boolean }) {
   const content = (
     <>
-      <div className="relative h-[72px] w-[118px] shrink-0 overflow-hidden rounded-md bg-zinc-800">
+      <div className="relative h-[72px] w-[118px] shrink-0 overflow-hidden rounded-md bg-skeleton">
         <MediaImage src={episode.image} alt={episode.title} sizes="118px" />
         {playing ? (
           <>
@@ -54,7 +54,7 @@ export function UpNextRow({ episode, playing = false }: { episode: ReplayEpisode
         <h3
           className={cn(
             "mt-1 line-clamp-2 text-sm font-semibold leading-snug",
-            playing ? "text-white" : "text-white group-hover:text-brand",
+            playing ? "text-fg" : "text-fg group-hover:text-brand",
           )}
         >
           {episode.title}
@@ -68,7 +68,7 @@ export function UpNextRow({ episode, playing = false }: { episode: ReplayEpisode
 
   if (playing) {
     return (
-      <div className="flex gap-3 rounded-lg bg-white/5 p-1.5" aria-current="true">
+      <div className="flex gap-3 rounded-lg bg-fg/5 p-1.5" aria-current="true">
         {content}
       </div>
     );

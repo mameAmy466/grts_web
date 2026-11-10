@@ -46,12 +46,12 @@ export function ProgramGuide({ todaySlots }: { todaySlots?: ProgramSlot[] }) {
   }, [tab, slots]);
 
   return (
-    <aside id="guide" className="card-glass rounded-xl bg-white/[0.02] p-4 backdrop-blur-xl md:p-5">
+    <aside id="guide" className="card-glass rounded-xl p-4 backdrop-blur-xl md:p-5">
       <div className="mb-4 flex items-center gap-2">
         <IconCalendar className="h-5 w-5 text-brand" />
-        <h2 className="text-lg font-bold text-white">Program Guide</h2>
+        <h2 className="text-lg font-bold text-fg">Program Guide</h2>
       </div>
-      <div className="mb-4 grid grid-cols-3 rounded-full bg-black/40 p-1 text-xs font-semibold">
+      <div className="mb-4 grid grid-cols-3 rounded-full bg-fg/10 p-1 text-xs font-semibold">
         {tabs.map((item) => (
           <button
             key={item.id}
@@ -59,7 +59,7 @@ export function ProgramGuide({ todaySlots }: { todaySlots?: ProgramSlot[] }) {
             onClick={() => setTab(item.id)}
             className={cn(
               "rounded-full px-2 py-2",
-              tab === item.id ? "bg-brand text-white" : "text-zinc-400 hover:text-white",
+              tab === item.id ? "bg-brand text-white" : "text-fg-muted hover:text-fg",
             )}
           >
             {item.label}
@@ -80,7 +80,7 @@ function GuideRow({ slot, live }: { slot: ProgramSlot; live: boolean }) {
     <li
       className={cn(
         "relative flex items-start gap-3 rounded-lg px-3 py-2.5",
-        live ? "bg-white/5" : "",
+        live ? "bg-fg/5" : "",
       )}
     >
       {live ? (
@@ -88,9 +88,9 @@ function GuideRow({ slot, live }: { slot: ProgramSlot; live: boolean }) {
           Now live
         </span>
       ) : null}
-      <p className="w-12 shrink-0 text-sm font-bold text-white">{slot.time}</p>
+      <p className="w-12 shrink-0 text-sm font-bold text-fg">{slot.time}</p>
       <div className="min-w-0">
-        <p className="text-sm font-semibold text-white">{slot.title}</p>
+        <p className="text-sm font-semibold text-fg">{slot.title}</p>
         {slot.category ? <p className="mt-0.5 text-[11px] text-zinc-500">{slot.category}</p> : null}
       </div>
     </li>

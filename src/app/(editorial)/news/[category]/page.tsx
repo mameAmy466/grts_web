@@ -49,7 +49,7 @@ export default async function NewsCategoryPage({
       <SiteWrap className="grid gap-8 py-8 md:grid-cols-12 md:gap-10">
         <div className="min-w-0 md:col-span-7 lg:col-span-8">
           <Link href={featured.href} className="group grid gap-6 md:grid-cols-2">
-            <div className="relative aspect-[16/11] overflow-hidden rounded-xl bg-zinc-200">
+            <div className="relative aspect-[16/11] overflow-hidden rounded-xl bg-skeleton">
               <MediaImage
                 src={featured.image}
                 alt={featured.title}
@@ -60,10 +60,10 @@ export default async function NewsCategoryPage({
               <p className="text-[11px] font-semibold uppercase tracking-wide text-brand">
                 {featured.categoryLabel}
               </p>
-              <h1 className="mt-2 line-clamp-3 break-words text-2xl font-bold leading-tight text-zinc-900 md:text-3xl">
+              <h1 className="mt-2 line-clamp-3 break-words text-2xl font-bold leading-tight text-fg md:text-3xl">
                 {clipText(featured.title, 110)}
               </h1>
-              <p className="mt-3 line-clamp-3 break-words text-sm leading-6 text-zinc-600">
+              <p className="mt-3 line-clamp-3 break-words text-sm leading-6 text-fg-muted">
                 {clipText(featured.excerpt, 160)}
               </p>
               <p className="mt-4 text-xs text-zinc-500">

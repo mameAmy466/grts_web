@@ -1,4 +1,3 @@
-export type ChromeTheme = "dark" | "light";
 
 export type CategorySlug = string;
 

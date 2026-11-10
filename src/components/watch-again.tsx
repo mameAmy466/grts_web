@@ -39,7 +39,7 @@ function CategoryPill({
       className={
         tone === "light"
           ? "inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-zinc-900"
-          : "inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-medium text-zinc-200"
+          : "inline-flex items-center gap-1.5 rounded-full bg-fg/10 px-2.5 py-1 text-[11px] font-medium text-fg-soft"
       }
     >
       <span className="h-1.5 w-1.5 rounded-full bg-brand" />
@@ -65,7 +65,7 @@ export function WatchAgain({ videos }: { videos: VideoItem[] }) {
       <div className="grid min-w-0 items-stretch gap-4 md:grid-cols-12 md:gap-3">
         <Link
           href={featured.href}
-          className="group relative block h-full min-h-[220px] overflow-hidden rounded-xl bg-[#1a1a1a] sm:min-h-[360px] md:col-span-7 md:min-h-[420px]"
+          className="group relative block h-full min-h-[220px] overflow-hidden rounded-xl bg-surface sm:min-h-[360px] md:col-span-7 md:min-h-[420px]"
         >
           <div className="absolute inset-0 overflow-hidden">
             <MediaImage src={featured.image} alt={featured.title} />
@@ -85,8 +85,8 @@ export function WatchAgain({ videos }: { videos: VideoItem[] }) {
         </Link>
 
         {latest.length ? (
-          <div className="card-glass flex min-w-0 flex-col rounded-[20px] bg-white/[0.02] p-4 backdrop-blur-xl md:col-span-5 md:h-full sm:p-5 md:p-6">
-            <h3 className="text-xl font-semibold text-white">Latest videos</h3>
+          <div className="card-glass flex min-w-0 flex-col rounded-[20px] p-4 backdrop-blur-xl md:col-span-5 md:h-full sm:p-5 md:p-6">
+            <h3 className="text-xl font-semibold text-fg">Latest videos</h3>
             <div className="mt-4 flex min-h-0 flex-1 flex-col gap-3">
               {latest.map((video) => (
                 <Link
@@ -94,16 +94,16 @@ export function WatchAgain({ videos }: { videos: VideoItem[] }) {
                   href={video.href}
                   className="group flex min-h-0 flex-1 items-center gap-3"
                 >
-                  <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-md bg-zinc-800">
+                  <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-md bg-skeleton">
                     <MediaImage src={video.image} alt={video.title} sizes="140px" />
                     <PlayBadge className="absolute bottom-1.5 left-1.5 h-7 w-7" />
                   </div>
                   <div className="min-w-0">
-                    <h4 className="line-clamp-3 text-sm font-semibold leading-snug text-white group-hover:text-brand">
+                    <h4 className="line-clamp-3 text-sm font-semibold leading-snug text-fg group-hover:text-brand">
                       {video.title}
                     </h4>
                     {video.views ? (
-                      <p className="mt-1 text-sm font-semibold text-white">{video.views}</p>
+                      <p className="mt-1 text-sm font-semibold text-fg">{video.views}</p>
                     ) : null}
                     <p className="mt-1 text-xs text-zinc-500">
                       {[formatDisplayDate(video.posted), isRealDuration(video.duration) ? video.duration : ""]
@@ -121,7 +121,7 @@ export function WatchAgain({ videos }: { videos: VideoItem[] }) {
       {visible.length ? (
         <div className="mt-14">
           <div className="mb-6 flex items-center justify-between gap-4">
-            <h3 className="text-xl font-semibold text-white">More replays</h3>
+            <h3 className="text-xl font-semibold text-fg">More replays</h3>
             {pages > 1 ? (
               <div className="flex items-center gap-2">
                 <button
@@ -129,7 +129,7 @@ export function WatchAgain({ videos }: { videos: VideoItem[] }) {
                   aria-label="Previous replays"
                   onClick={() => setPage((value) => Math.max(0, value - 1))}
                   disabled={page === 0}
-                  className="btn-glass-dark flex h-9 w-9 items-center justify-center rounded-full text-white disabled:opacity-30"
+                  className="btn-chrome flex h-9 w-9 items-center justify-center rounded-full text-fg disabled:opacity-30"
                 >
                   <IconArrowLeft className="h-4 w-4" />
                 </button>
@@ -138,7 +138,7 @@ export function WatchAgain({ videos }: { videos: VideoItem[] }) {
                   aria-label="Next replays"
                   onClick={() => setPage((value) => Math.min(pages - 1, value + 1))}
                   disabled={page >= pages - 1}
-                  className="btn-glass-dark flex h-9 w-9 items-center justify-center rounded-full text-white disabled:opacity-30"
+                  className="btn-chrome flex h-9 w-9 items-center justify-center rounded-full text-fg disabled:opacity-30"
                 >
                   <IconArrowRight className="h-4 w-4" />
                 </button>
@@ -150,18 +150,18 @@ export function WatchAgain({ videos }: { videos: VideoItem[] }) {
             {visible.map((video) => {
               const blurb = videoBlurb(video);
               return (
-                <Link key={video.id} href={video.href} className="group block overflow-hidden rounded-[20px] bg-[#1a1a1a] p-3">
-                  <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-zinc-800">
+                <Link key={video.id} href={video.href} className="group block overflow-hidden rounded-[20px] bg-surface p-3">
+                  <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-skeleton">
                     <MediaImage src={video.image} alt={video.title} sizes="(min-width: 1024px) 22vw, 50vw" />
                     <PlayBadge className="absolute bottom-3 left-3" />
                   </div>
                   <div className="mt-4 px-1">
                     <CategoryPill label={video.category} tone="dark" />
-                    <h4 className="mt-3 line-clamp-2 text-lg font-semibold leading-snug text-white group-hover:text-brand">
+                    <h4 className="mt-3 line-clamp-2 text-lg font-semibold leading-snug text-fg group-hover:text-brand">
                       {video.title}
                     </h4>
                     {blurb ? (
-                      <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-400">{blurb}</p>
+                      <p className="mt-2 line-clamp-2 text-sm leading-6 text-fg-muted">{blurb}</p>
                     ) : null}
                     <p className="mt-3 text-xs text-zinc-500">{videoMeta(video)}</p>
                   </div>
@@ -181,10 +181,10 @@ export function WatchAgain({ videos }: { videos: VideoItem[] }) {
                   className={
                     index === page
                       ? "flex h-6 w-6 items-center justify-center"
-                      : "px-1 hover:text-white"
+                      : "px-1 hover:text-fg"
                   }
                 >
-                  {index === page ? <span className="h-2.5 w-2.5 rounded-full bg-white" /> : index + 1}
+                  {index === page ? <span className="h-2.5 w-2.5 rounded-full bg-fg" /> : index + 1}
                 </button>
               ))}
             </div>
