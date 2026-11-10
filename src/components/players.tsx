@@ -262,12 +262,12 @@ export function LiveNowCopy({
 }) {
   return (
     <div className="mt-5">
-      <h1 className="flex items-center gap-2 text-2xl font-bold text-white md:text-3xl">
+      <h1 className="flex items-center gap-2 text-2xl font-bold text-fg md:text-3xl">
         {live ? <span className="h-2.5 w-2.5 rounded-full bg-brand" /> : null}
         {title}
       </h1>
       {description ? (
-        <p className="mt-2 max-w-2xl text-sm leading-7 text-zinc-400">{description}</p>
+        <p className="mt-2 max-w-2xl text-sm leading-7 text-fg-muted">{description}</p>
       ) : null}
     </div>
   );
@@ -279,19 +279,19 @@ export function LiveRadioCard() {
   const title = radio?.station?.title || "GRTS Radio";
 
   return (
-    <div className="mt-5 flex items-center justify-between gap-4 rounded-2xl bg-[#111] px-4 py-3">
+    <div className="mt-5 flex items-center justify-between gap-4 rounded-2xl bg-surface px-4 py-3">
       <Link href="/radio" className="flex min-w-0 items-center gap-3">
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand text-white">
           <IconRadio className="h-5 w-5" />
         </span>
         <div className="min-w-0">
-          <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-white">
+          <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-fg">
             {title}
-            <span className="rounded bg-brand px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide">
+            <span className="rounded bg-brand px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
               Live now
             </span>
           </p>
-          <p className="mt-0.5 text-xs text-zinc-400">Listen on GRTS FM without using video data</p>
+          <p className="mt-0.5 text-xs text-fg-muted">Listen on GRTS FM without using video data</p>
         </div>
       </Link>
       <button
@@ -299,7 +299,7 @@ export function LiveRadioCard() {
         aria-label={playing ? "Pause radio" : "Play radio"}
         onClick={() => void radio?.toggle()}
         disabled={!radio?.station?.streamUrl}
-        className="btn-glass-dark flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-white disabled:opacity-40"
+        className="btn-chrome flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-fg disabled:opacity-40"
       >
         {playing ? <IconPause className="h-5 w-5" /> : <IconPlay className="ml-0.5 h-5 w-5" />}
       </button>
@@ -328,28 +328,28 @@ export function StickyRadioBar() {
   const station = radio?.station;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[#111]/95 backdrop-blur">
+    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-subtle/95 backdrop-blur">
       <div className="mx-auto flex h-16 w-full max-w-[1514px] items-center gap-3 px-4 sm:px-8 xl:px-32">
         <button
           type="button"
           aria-label={playing ? "Pause radio" : "Play radio"}
           onClick={() => void radio?.toggle()}
           disabled={!station?.streamUrl}
-          className="btn-glass-dark flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white disabled:opacity-40"
+          className="btn-chrome flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-fg disabled:opacity-40"
         >
           {playing ? <IconPause className="h-4 w-4" /> : <IconPlay className="ml-0.5 h-4 w-4" />}
         </button>
         <Link href="/radio" className="min-w-0">
-          <p className="truncate text-sm font-semibold text-white">
+          <p className="truncate text-sm font-semibold text-fg">
             {station?.title || "GRTS Radio"}{" "}
-            <span className="ml-2 rounded bg-brand px-1.5 py-0.5 text-[10px] font-bold">LIVE</span>
+            <span className="ml-2 rounded bg-brand px-1.5 py-0.5 text-[10px] font-bold text-white">LIVE</span>
           </p>
-          <p className="text-[11px] text-zinc-400">{station?.description || "National Radio - Gambia"}</p>
+          <p className="text-[11px] text-fg-muted">{station?.description || "National Radio - Gambia"}</p>
         </Link>
         <Waveform className="hidden flex-1 sm:block" accent={playing} />
         <Link
           href="/radio"
-          className="hidden rounded-full border border-white/15 px-3 py-1.5 text-xs font-medium text-white hover:border-white/40 sm:inline"
+          className="hidden rounded-full border border-fg/15 px-3 py-1.5 text-xs font-medium text-fg hover:border-fg/40 sm:inline"
         >
           Open radio
         </Link>
@@ -374,7 +374,7 @@ export function FmNowPlaying({
   const stationTitle = radio?.station?.title || title;
 
   return (
-    <div className="flex h-[221px] w-full max-w-[460px] flex-col gap-6 rounded-[24px] bg-[#0A0A0A] p-8">
+    <div className="flex h-[221px] w-full max-w-[460px] flex-col gap-6 rounded-[24px] bg-page p-8">
       <div className="flex items-start justify-between gap-3">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-brand px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
           <span className="h-1.5 w-1.5 rounded-full bg-white" />
@@ -401,8 +401,8 @@ export function FmNowPlaying({
           </span>
         </button>
         <div className="min-w-0">
-          <h2 className="text-lg font-bold text-white">{stationTitle}</h2>
-          <p className="mt-1 text-sm leading-6 text-zinc-400">{radio?.station?.description || description}</p>
+          <h2 className="text-lg font-bold text-fg">{stationTitle}</h2>
+          <p className="mt-1 text-sm leading-6 text-fg-muted">{radio?.station?.description || description}</p>
         </div>
       </div>
     </div>
@@ -431,7 +431,7 @@ export function FmPlayerBar({
   }
 
   return (
-    <div className="w-full border-t border-[var(--color-bg-primary,#0A0A0A)] bg-[#171717] shadow-[0_-8px_24px_#00000030]">
+    <div className="w-full border-t border-line bg-subtle shadow-[0_-8px_24px_#00000030]">
       <div className="mx-auto flex h-auto min-h-[88px] w-full max-w-[1512px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-16 xl:px-[180px]">
         <div className="flex min-w-0 items-center gap-3">
           <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-[12px] bg-zinc-700">
@@ -442,7 +442,7 @@ export function FmPlayerBar({
             />
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-white">{stationTitle}</p>
+            <p className="truncate text-sm font-semibold text-fg">{stationTitle}</p>
             <span className="rounded bg-brand px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
               Live
             </span>
@@ -451,8 +451,8 @@ export function FmPlayerBar({
         <Waveform className="hidden flex-1 lg:block" accent />
         <div className="flex items-center gap-4">
           <div className="hidden items-center gap-2 md:flex">
-            <IconVolume className="h-4 w-4 text-zinc-400" />
-            <span className="h-1 w-20 overflow-hidden rounded-full bg-white/15">
+            <IconVolume className="h-4 w-4 text-fg-muted" />
+            <span className="h-1 w-20 overflow-hidden rounded-full bg-fg/15">
               <span className="block h-full w-3/4 bg-brand" />
             </span>
           </div>
@@ -460,7 +460,7 @@ export function FmPlayerBar({
             type="button"
             aria-label={playing ? "Pause" : "Play"}
             onClick={() => void toggle()}
-            className="btn-glass-dark flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white"
+            className="btn-chrome flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-fg"
           >
             {playing ? <IconPause className="h-5 w-5" /> : <IconPlay className="ml-0.5 h-5 w-5" />}
           </button>
@@ -479,7 +479,7 @@ function Waveform({ className, accent = false }: { className?: string; accent?: 
         {bars.map((height, index) => (
           <span
             key={`${height}-${index}`}
-            className={accent && index < 8 ? "w-[3px] rounded-full bg-brand" : "w-[3px] rounded-full bg-white/35"}
+            className={accent && index < 8 ? "w-[3px] rounded-full bg-brand" : "w-[3px] rounded-full bg-fg/35"}
             style={{ height }}
           />
         ))}

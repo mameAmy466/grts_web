@@ -18,8 +18,8 @@ export async function NewsSidebar({
   const list = topics?.length ? topics : categories.filter((item) => item.slug !== "culture");
   return (
     <aside className="min-w-0 md:col-span-5 md:self-start lg:sticky lg:top-[calc(var(--site-header)+1rem)] lg:col-span-4">
-      <h2 className="text-lg font-bold text-zinc-900">Explore Topics</h2>
-      <ul className="mt-4 divide-y divide-zinc-200 border-y border-zinc-200">
+      <h2 className="text-lg font-bold text-fg">Explore Topics</h2>
+      <ul className="mt-4 divide-y divide-line border-y border-line">
         {list.map((item) => (
             <li key={item.slug}>
               <Link
@@ -27,7 +27,7 @@ export async function NewsSidebar({
                 className={`flex items-center justify-between py-3 text-sm ${
                   item.slug === activeCategory
                     ? "font-semibold text-brand"
-                    : "text-zinc-700 hover:text-brand"
+                    : "text-fg-soft hover:text-brand"
                 }`}
               >
                 {item.label}
@@ -37,19 +37,19 @@ export async function NewsSidebar({
           ))}
       </ul>
 
-      <h2 className="mt-8 text-lg font-bold text-zinc-900">Editor&apos;s Choice</h2>
+      <h2 className="mt-8 text-lg font-bold text-fg">Editor&apos;s Choice</h2>
       <ul className="mt-4 space-y-4">
         {picks.map((article) => (
           <li key={article.id}>
             <Link href={article.href} className="group flex gap-3">
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-zinc-200">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-skeleton">
                 <MediaImage src={article.image} alt={article.title} sizes="64px" />
               </div>
               <div className="min-w-0">
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-brand">
                   {article.categoryLabel}
                 </p>
-                <p className="line-clamp-3 break-words text-sm font-semibold leading-snug text-zinc-900 group-hover:text-brand">
+                <p className="line-clamp-3 break-words text-sm font-semibold leading-snug text-fg group-hover:text-brand">
                   {clipText(article.title, 72)}
                 </p>
               </div>

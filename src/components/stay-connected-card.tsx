@@ -5,7 +5,7 @@ import { unsplash } from "@/lib/utils";
 
 export function StayConnectedCard() {
   return (
-    <div className="relative overflow-hidden rounded-xl bg-[#171717] p-5 text-white">
+    <div className="relative overflow-hidden rounded-xl bg-subtle p-5 text-fg">
       <div className="absolute inset-y-0 right-0 w-1/2">
         <MediaImage
           src={unsplash("photo-1573497019940-1c28c88b4f3e", 500)}
@@ -30,14 +30,14 @@ export function StayConnectedCard() {
               target="_blank"
               rel="noreferrer"
               aria-label={item.name}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 hover:bg-brand"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-fg/10 hover:bg-brand hover:text-white"
             >
               <Icon className="h-3.5 w-3.5" />
             </a>
           );
         })}
       </div>
-      <p className="relative mt-3 text-xs text-zinc-400">{SITE.email}</p>
+      <p className="relative mt-3 text-xs text-fg-muted">{SITE.email}</p>
     </div>
   );
 }

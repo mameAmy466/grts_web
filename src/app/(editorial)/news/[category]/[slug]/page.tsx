@@ -103,7 +103,7 @@ export default async function NewsArticlePage({
 
   return (
     <div className="pb-16">
-      <div className="bg-white">
+      <div className="bg-page">
         <SiteWrap className="py-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-500">
             <Link href="/news" className="hover:text-brand">
@@ -114,7 +114,7 @@ export default async function NewsArticlePage({
               {meta.label}
             </Link>
             <span className="mx-2">›</span>
-            <span className="text-zinc-700">{crumb}</span>
+            <span className="text-fg-soft">{crumb}</span>
           </p>
         </SiteWrap>
       </div>
@@ -124,15 +124,15 @@ export default async function NewsArticlePage({
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
             {article.categoryLabel}
           </p>
-          <h1 className="mt-2 text-2xl font-bold leading-tight text-zinc-900 sm:text-3xl md:text-4xl">
+          <h1 className="mt-2 text-2xl font-bold leading-tight text-fg sm:text-3xl md:text-4xl">
             {article.title}
           </h1>
           <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-zinc-500">
-            <span className="relative h-10 w-10 overflow-hidden rounded-full bg-zinc-200">
+            <span className="relative h-10 w-10 overflow-hidden rounded-full bg-skeleton">
               <MediaImage src={body.authorImage} alt={body.author} sizes="40px" />
             </span>
             <span>
-              By <span className="font-medium text-zinc-800">{body.author}</span>
+              By <span className="font-medium text-fg">{body.author}</span>
             </span>
             <span aria-hidden="true">·</span>
             <span>{formatDisplayDate(article.date)}</span>
@@ -145,7 +145,7 @@ export default async function NewsArticlePage({
           </div>
 
           <figure className="mt-5">
-            <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-zinc-200">
+            <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-skeleton">
               <MediaImage
                 src={article.image}
                 alt={article.title}
@@ -158,16 +158,16 @@ export default async function NewsArticlePage({
             </figcaption>
           </figure>
 
-          <div className="mt-6 text-[17px] leading-8 text-zinc-700">
+          <div className="mt-6 text-[17px] leading-8 text-fg-soft">
             {article.contentHtml ? (
               <div className="wp-content" dangerouslySetInnerHTML={{ __html: article.contentHtml }} />
             ) : (
               <div className="space-y-5">
-                <p className="font-semibold text-zinc-900">{body.lead}</p>
+                <p className="font-semibold text-fg">{body.lead}</p>
                 {body.sections.map((section) => (
                   <section key={section.heading ?? section.paragraphs[0]}>
                     {section.heading ? (
-                      <h2 className="mb-2 text-xl font-bold text-zinc-900">{section.heading}</h2>
+                      <h2 className="mb-2 text-xl font-bold text-fg">{section.heading}</h2>
                     ) : null}
                     {section.paragraphs.map((paragraph) => (
                       <p key={paragraph} className="mt-3 first:mt-0">
@@ -186,7 +186,7 @@ export default async function NewsArticlePage({
                 <Link
                   key={tag}
                   href={`/news/${article.category}`}
-                  className="rounded-full bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-200"
+                  className="rounded-full bg-fg/5 px-3 py-1.5 text-xs font-medium text-fg-muted hover:bg-fg/10"
                 >
                   {tag}
                 </Link>
@@ -194,8 +194,8 @@ export default async function NewsArticlePage({
             </div>
           ) : null}
 
-          <div className="mt-6 border-t border-zinc-200 pt-5">
-            <p className="text-sm font-semibold text-zinc-800">Share this article:</p>
+          <div className="mt-6 border-t border-line pt-5">
+            <p className="text-sm font-semibold text-fg">Share this article:</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {share.map(({ name, href, Icon }) => (
                 <a
@@ -203,7 +203,7 @@ export default async function NewsArticlePage({
                   href={href}
                   target="_blank"
                   rel="noreferrer"
-                  className="btn-glass inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-zinc-700 hover:text-brand"
+                  className="btn-chrome inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-fg-soft hover:text-brand"
                 >
                   <Icon className="h-4 w-4" />
                   {name}
@@ -214,11 +214,11 @@ export default async function NewsArticlePage({
 
           {related.length ? (
             <div className="mt-8">
-              <h2 className="text-2xl font-bold text-zinc-900">Related Articles</h2>
+              <h2 className="text-2xl font-bold text-fg">Related Articles</h2>
               <div className="mt-4 grid gap-5 sm:grid-cols-3">
                 {related.map((item) => (
                   <Link key={item.id} href={item.href} className="group block">
-                    <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-zinc-200">
+                    <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-skeleton">
                       <MediaImage
                         src={item.image}
                         alt={item.title}
@@ -227,7 +227,7 @@ export default async function NewsArticlePage({
                     <p className="mt-2 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
                       {item.categoryLabel} • {formatDisplayDate(item.date)}
                     </p>
-                    <h3 className="mt-1 line-clamp-3 break-words text-sm font-bold leading-snug text-zinc-900 group-hover:text-brand">
+                    <h3 className="mt-1 line-clamp-3 break-words text-sm font-bold leading-snug text-fg group-hover:text-brand">
                       {clipText(item.title, 90)}
                     </h3>
                   </Link>

@@ -33,7 +33,7 @@ export default async function ProgrammeReplayPage({
   if (!episodes.length && !fallback) notFound();
 
   return (
-    <Suspense fallback={<div className="h-[70vh] animate-pulse bg-white/5" />}>
+    <Suspense fallback={<div className="h-[70vh] animate-pulse bg-fg/5" />}>
       <ProgrammeWatch slug={slug} episodes={episodes} fallback={fallback} />
     </Suspense>
   );

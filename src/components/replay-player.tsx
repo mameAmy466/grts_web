@@ -175,7 +175,7 @@ function ExpandableText({ text }: { text: string }) {
       >
         {text}
       </p>
-      <p className={`text-sm leading-7 text-zinc-400 ${expanded ? "" : "line-clamp-3"}`}>
+      <p className={`text-sm leading-7 text-fg-muted ${expanded ? "" : "line-clamp-3"}`}>
         {text}
       </p>
       {overflows ? (
@@ -370,17 +370,17 @@ export function ReplayPlayer({
           <span className="rounded bg-brand px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
             {episode.category}
           </span>
-          <span className="text-xs text-zinc-400">{formatDisplayDate(episode.published)}</span>
+          <span className="text-xs text-fg-muted">{formatDisplayDate(episode.published)}</span>
         </div>
         <div className="mt-3 flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h1 className="text-xl font-bold leading-tight text-white sm:text-2xl md:text-3xl">{episode.title}</h1>
-            <p className="mt-2 text-sm text-zinc-400">{episode.views}</p>
+            <h1 className="text-xl font-bold leading-tight text-fg sm:text-2xl md:text-3xl">{episode.title}</h1>
+            <p className="mt-2 text-sm text-fg-muted">{episode.views}</p>
           </div>
           <button
             type="button"
             onClick={() => void shareEpisode()}
-            className="btn-glass-dark inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-white sm:px-4"
+            className="btn-chrome inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-fg sm:px-4"
           >
             <IconShare className="h-4 w-4" />
             {shareLabel}
@@ -388,8 +388,8 @@ export function ReplayPlayer({
         </div>
       </div>
 
-      <div className="mt-5 rounded-xl bg-[#161616] p-5">
-        <h2 className="text-sm font-bold text-white">About this broadcast</h2>
+      <div className="mt-5 rounded-xl bg-surface p-5">
+        <h2 className="text-sm font-bold text-fg">About this broadcast</h2>
         <ExpandableText text={episode.about} />
       </div>
     </div>
@@ -409,10 +409,10 @@ export function AutoplayToggle({
       role="switch"
       aria-checked={enabled}
       onClick={() => onChange(!enabled)}
-      className="flex items-center gap-2 text-xs font-medium text-zinc-300"
+      className="flex items-center gap-2 text-xs font-medium text-fg-soft"
     >
       Autoplay
-      <span className={`relative h-5 w-9 rounded-full ${enabled ? "bg-brand" : "bg-zinc-600"}`}>
+      <span className={`relative h-5 w-9 rounded-full ${enabled ? "bg-brand" : "bg-zinc-400 dark:bg-zinc-600"}`}>
         <span
           className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition ${
             enabled ? "left-4" : "left-0.5"

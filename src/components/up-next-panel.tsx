@@ -19,9 +19,9 @@ export function UpNextPanel({
   const showAutoplay = Boolean(onAutoplayChange) && upcoming.length > 0;
 
   return (
-    <aside className="flex h-full min-h-0 w-full flex-1 flex-col rounded-xl bg-[#141414] p-4">
+    <aside className="flex h-full min-h-0 w-full flex-1 flex-col rounded-xl bg-surface p-4">
       <div className="mb-4 flex shrink-0 items-center justify-between">
-        <h2 className="text-lg font-bold text-white">Up Next</h2>
+        <h2 className="text-lg font-bold text-fg">Up Next</h2>
         {showAutoplay ? <AutoplayToggle enabled={autoplay ?? false} onChange={onAutoplayChange!} /> : null}
       </div>
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto">

@@ -60,7 +60,7 @@ export default async function LivePage({
   const videoId = typeof params.v === "string" ? params.v : params.v?.[0];
 
   return (
-    <div className="bg-[#0A0A0A] pb-28">
+    <div className="bg-page pb-28">
       <LiveDesk
         channelId={channel?.id}
         liveTitle={channel ? `${channel.title} — Live Broadcast` : "GRTS TV — Live Broadcast"}
@@ -68,7 +68,7 @@ export default async function LivePage({
         videoId={videoId}
         videos={videos}
         guide={
-          <Suspense fallback={<div className="h-[420px] animate-pulse rounded-xl bg-white/5" />}>
+          <Suspense fallback={<div className="h-[420px] animate-pulse rounded-xl bg-fg/5" />}>
             <LiveGuide />
           </Suspense>
         }

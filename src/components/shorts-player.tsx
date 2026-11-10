@@ -171,7 +171,7 @@ export function ShortsPlayer({
               aria-label="Short précédent"
               disabled={active === 0}
               onClick={() => scrollTo(active - 1)}
-              className="btn-glass-dark flex h-11 w-11 items-center justify-center rounded-full text-white disabled:opacity-30"
+              className="btn-chrome flex h-11 w-11 items-center justify-center rounded-full text-fg disabled:opacity-30"
             >
               <IconChevronLeft className="h-5 w-5 rotate-90" />
             </button>
@@ -180,7 +180,7 @@ export function ShortsPlayer({
               aria-label="Short suivant"
               disabled={active === shorts.length - 1}
               onClick={() => scrollTo(active + 1)}
-              className="btn-glass-dark flex h-11 w-11 items-center justify-center rounded-full text-white disabled:opacity-30"
+              className="btn-chrome flex h-11 w-11 items-center justify-center rounded-full text-fg disabled:opacity-30"
             >
               <IconChevronRight className="h-5 w-5 rotate-90" />
             </button>
@@ -189,8 +189,8 @@ export function ShortsPlayer({
 
         <div className="mx-auto mt-4 max-w-[420px]">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-brand">{current.category}</p>
-          <h1 className="mt-1 text-xl font-bold leading-snug text-white">{current.title}</h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <h1 className="mt-1 text-xl font-bold leading-snug text-fg">{current.title}</h1>
+          <p className="mt-1 text-sm text-fg-muted">
             {current.duration} · {active + 1}/{shorts.length}
           </p>
           <div className="mt-4 flex gap-2 xl:hidden">
@@ -198,7 +198,7 @@ export function ShortsPlayer({
               type="button"
               disabled={active === 0}
               onClick={() => scrollTo(active - 1)}
-              className="btn-glass-dark flex-1 rounded-full py-2 text-sm text-white disabled:opacity-30"
+              className="btn-chrome flex-1 rounded-full py-2 text-sm text-fg disabled:opacity-30"
             >
               Précédent
             </button>
@@ -206,7 +206,7 @@ export function ShortsPlayer({
               type="button"
               disabled={active === shorts.length - 1}
               onClick={() => scrollTo(active + 1)}
-              className="btn-glass-dark flex-1 rounded-full py-2 text-sm text-white disabled:opacity-30"
+              className="btn-chrome flex-1 rounded-full py-2 text-sm text-fg disabled:opacity-30"
             >
               Suivant
             </button>
@@ -215,7 +215,7 @@ export function ShortsPlayer({
       </div>
 
       <aside className="hidden lg:col-span-7 lg:block">
-        <h2 className="mb-4 text-lg font-bold text-white">Les shorts</h2>
+        <h2 className="mb-4 text-lg font-bold text-fg">Les shorts</h2>
         <div className="grid grid-cols-3 justify-items-start gap-2">
           {shorts.map((item, index) => (
             <ShortCard

@@ -46,14 +46,14 @@ export function VideoCard({
 }) {
   const cardClassName = cn(
     "group flex h-full w-full flex-col gap-2.5 rounded-lg text-left",
-    selected && "rounded-xl bg-[#141414] p-4",
+    selected && "rounded-xl bg-surface p-4",
     className,
   );
   const date = formatDisplayDate(video.posted);
   const description = video.description?.trim();
   const content = (
     <>
-      <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-[8px] bg-zinc-800">
+      <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-[8px] bg-skeleton">
         <MediaImage
           src={video.image}
           alt={video.title}
@@ -63,19 +63,19 @@ export function VideoCard({
         <Duration value={video.duration} />
       </div>
       <div className="min-w-0 px-0.5">
-        <h3 className="line-clamp-2 text-sm font-bold leading-snug text-white group-hover:text-brand">
+        <h3 className="line-clamp-2 text-sm font-bold leading-snug text-fg group-hover:text-brand">
           {video.title}
         </h3>
         {compact ? (
           description || date ? (
-            <p className="mt-1 flex items-center gap-1 text-xs leading-5 text-zinc-400">
+            <p className="mt-1 flex items-center gap-1 text-xs leading-5 text-fg-muted">
               {description ? <span className="min-w-0 truncate">{description}</span> : null}
               {description && date ? <span className="shrink-0 text-zinc-500">·</span> : null}
               {date ? <span className="shrink-0 text-zinc-500">{date}</span> : null}
             </p>
           ) : null
         ) : date ? (
-          <p className="mt-1 text-xs text-zinc-400">{date}</p>
+          <p className="mt-1 text-xs text-fg-muted">{date}</p>
         ) : null}
       </div>
     </>
@@ -108,8 +108,8 @@ export function ShortCard({
   className?: string;
 }) {
   const cardClassName = cn(
-    "group relative block h-[350px] w-[220px] overflow-hidden rounded-lg border bg-zinc-800 text-left",
-    selected ? "border-brand" : "border-[var(--color-bg-primary,#0A0A0A)]",
+    "group relative block h-[350px] w-[220px] overflow-hidden rounded-lg border bg-skeleton text-left",
+    selected ? "border-brand" : "border-line",
     className,
   );
   const content = (
@@ -151,22 +151,17 @@ export function ShortCard({
 
 export function NewsThumbRow({
   article,
-  theme = "dark",
 }: {
   article: Article;
-  theme?: "dark" | "light";
 }) {
   return (
     <Link href={article.href} className="group flex gap-3">
-      <div className="relative h-[68px] w-[104px] shrink-0 overflow-hidden rounded-md bg-zinc-200">
+      <div className="relative h-[68px] w-[104px] shrink-0 overflow-hidden rounded-md bg-skeleton">
         <MediaImage src={article.image} alt={article.title} sizes="120px" />
       </div>
       <div className="min-w-0">
         <h3
-          className={cn(
-            "line-clamp-3 break-words text-sm font-semibold leading-snug group-hover:text-brand",
-            theme === "dark" ? "text-white" : "text-zinc-900",
-          )}
+          className="line-clamp-3 break-words text-sm font-semibold leading-snug text-fg group-hover:text-brand"
         >
           {clipText(article.title, 72)}
         </h3>
@@ -178,14 +173,12 @@ export function NewsThumbRow({
 
 export function NewsGridCard({
   article,
-  theme = "dark",
 }: {
   article: Article;
-  theme?: "dark" | "light";
 }) {
   return (
     <Link href={article.href} className="group block">
-      <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-zinc-200">
+      <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-skeleton">
         <MediaImage
           src={article.image}
           alt={article.title}
@@ -195,10 +188,7 @@ export function NewsGridCard({
         {article.categoryLabel}
       </p>
       <h3
-        className={cn(
-          "mt-1 line-clamp-3 break-words text-[15px] font-semibold leading-snug group-hover:text-brand",
-          theme === "dark" ? "text-white" : "text-zinc-900",
-        )}
+        className="mt-1 line-clamp-3 break-words text-[15px] font-semibold leading-snug text-fg group-hover:text-brand"
       >
         {clipText(article.title, 90)}
       </h3>
@@ -218,7 +208,7 @@ export function NewsOverlayCard({
 }) {
   return (
     <Link href={article.href} className={cn("group relative block h-full overflow-hidden rounded-xl", className)}>
-      <div className={cn("relative h-full min-w-0 bg-zinc-800", large ? "aspect-[16/10] min-h-[220px] sm:min-h-[360px] md:min-h-[420px]" : "aspect-[16/10]")}>
+      <div className={cn("relative h-full min-w-0 bg-skeleton", large ? "aspect-[16/10] min-h-[220px] sm:min-h-[360px] md:min-h-[420px]" : "aspect-[16/10]")}>
         <MediaImage
           src={article.image}
           alt={article.title}
@@ -241,16 +231,14 @@ export function NewsOverlayCard({
 
 export function SideNewsRow({
   article,
-  theme = "dark",
   className,
 }: {
   article: Article;
-  theme?: "dark" | "light";
   className?: string;
 }) {
   return (
     <Link href={article.href} className={cn("group flex items-center gap-3", className)}>
-      <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-md bg-zinc-200">
+      <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-md bg-skeleton">
         <MediaImage src={article.image} alt={article.title} sizes="140px" />
       </div>
       <div className="min-w-0">
@@ -258,10 +246,7 @@ export function SideNewsRow({
           {article.categoryLabel}
         </p>
         <h3
-          className={cn(
-            "mt-1 line-clamp-3 break-words text-sm font-semibold leading-snug group-hover:text-brand",
-            theme === "dark" ? "text-white" : "text-zinc-900",
-          )}
+          className="mt-1 line-clamp-3 break-words text-sm font-semibold leading-snug text-fg group-hover:text-brand"
         >
           {clipText(article.title, 80)}
         </h3>
@@ -308,7 +293,7 @@ export function EpisodeCard({
         <p className="text-[11px] font-medium text-[var(--color-text-secondary,#a3a3a3)]">
           {playing ? <span className="font-semibold uppercase tracking-wide text-brand">Now playing</span> : episode.category}
         </p>
-        <h3 className="mt-1 line-clamp-2 text-sm font-semibold leading-snug text-white group-hover:text-brand">
+        <h3 className="mt-1 line-clamp-2 text-sm font-semibold leading-snug text-fg group-hover:text-brand">
           {episode.title}
         </h3>
         <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-[var(--color-text-secondary,#a3a3a3)]">
@@ -366,15 +351,13 @@ function WaveArt() {
 export function SectionHeading({
   title,
   href,
-  theme = "dark",
 }: {
   title: string;
   href?: string;
-  theme?: "dark" | "light";
 }) {
   return (
     <div className="mb-5 flex items-end justify-between gap-4">
-      <h2 className={cn("text-2xl font-bold", theme === "dark" ? "text-white" : "text-zinc-900")}>
+      <h2 className="text-2xl font-bold text-fg">
         {title}
       </h2>
       {href ? (
@@ -383,7 +366,7 @@ export function SectionHeading({
           aria-label={`See more: ${title}`}
           className={cn(
             "flex h-9 w-9 items-center justify-center rounded-full",
-            theme === "dark" ? "btn-glass-dark text-white hover:text-brand" : "btn-glass text-zinc-700 hover:text-brand",
+            "btn-chrome text-fg hover:text-brand",
           )}
         >
           <IconArrowRight className="h-4 w-4" />

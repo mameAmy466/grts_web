@@ -57,7 +57,7 @@ export default async function ProgrammeDetailPage({
         <SiteWrap className="pt-10">
           <div className="w-full pb-10">
           <div className="flex h-auto w-full max-w-[1143px] flex-col items-start gap-6 opacity-100 sm:flex-row sm:items-center sm:gap-8 lg:h-[335px] lg:gap-10">
-            <div className="relative mx-auto h-[260px] w-[195px] shrink-0 overflow-hidden rounded-xl bg-zinc-800 sm:mx-0 sm:h-[300px] sm:w-[225px] lg:h-[335px] lg:w-[251px]">
+            <div className="relative mx-auto h-[260px] w-[195px] shrink-0 overflow-hidden rounded-xl bg-skeleton sm:mx-0 sm:h-[300px] sm:w-[225px] lg:h-[335px] lg:w-[251px]">
               <MediaImage
                 src={program.poster ?? program.image}
                 alt={program.title}
@@ -79,11 +79,11 @@ export default async function ProgrammeDetailPage({
                   {program.badge}
                 </span>
               ) : null}
-              <h1 className="mt-3 text-3xl font-bold uppercase tracking-tight text-white sm:mt-4 sm:text-4xl md:text-5xl">
+              <h1 className="mt-3 text-3xl font-bold uppercase tracking-tight text-fg sm:mt-4 sm:text-4xl md:text-5xl">
                 {program.title}
               </h1>
               {program.description ? (
-                <p className="mt-4 text-sm leading-7 text-zinc-300">{program.description}</p>
+                <p className="mt-4 text-sm leading-7 text-fg-soft">{program.description}</p>
               ) : null}
               {episodeVideos.length ? (
                 <Link
