@@ -538,7 +538,7 @@ function RadioVolume({ className }: { className?: string }) {
         onChange={(event) => radio.setVolume(Number(event.target.value) / 100)}
         aria-label="Radio volume"
         aria-valuetext={`${level}%`}
-        className="radio-volume h-1 w-24 cursor-pointer"
+        className="range-slider h-1 w-24 cursor-pointer"
         style={{ "--level": `${level}%` } as CSSProperties}
       />
     </div>

@@ -2,15 +2,10 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  IconExpand,
-  IconPause,
-  IconPlay,
-  IconShare,
-  IconVolume,
-} from "@/components/icons";
+import { IconPlay, IconShare } from "@/components/icons";
 import { HlsPlayer } from "@/components/hls-player";
 import { MediaImage } from "@/components/media-image";
+import { VideoControls } from "@/components/video-controls";
 import { fetchVideoPlayback } from "@/lib/playback-client";
 import type { ReplayEpisode } from "@/lib/types";
 import { formatDisplayDate, youtubeEmbedUrl, youtubeVideoId } from "@/lib/utils";
@@ -191,16 +186,6 @@ function ExpandableText({ text }: { text: string }) {
   );
 }
 
-function formatTime(total: number) {
-  const minutes = Math.floor(total / 60)
-    .toString()
-    .padStart(2, "0");
-  const seconds = Math.floor(total % 60)
-    .toString()
-    .padStart(2, "0");
-  return `${minutes}:${seconds}`;
-}
-
 export function ReplayPlayer({
   episode,
   nextHref,
@@ -209,9 +194,9 @@ export function ReplayPlayer({
   nextHref?: string;
 }) {
   const router = useRouter();
-  const start = Math.min(12, Math.max(0, episode.durationSeconds - 1));
   const [playing, setPlaying] = useState(false);
-  const [current, setCurrent] = useState(start);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
   const [playbackUrl, setPlaybackUrl] = useState("");
   const [loadingPlayback, setLoadingPlayback] = useState(false);
   const [continueAutoplay, setContinueAutoplay] = useState(false);
@@ -255,15 +240,6 @@ export function ReplayPlayer({
     window.history.replaceState(window.history.state, "", next);
   }, [autoPlayNext]);
 
-  useEffect(() => {
-    if (!playing) return;
-    const timer = window.setInterval(() => {
-      setCurrent((value) => (value >= episode.durationSeconds ? 0 : value + 1));
-    }, 1000);
-    return () => window.clearInterval(timer);
-  }, [playing, episode.durationSeconds]);
-
-  const progress = (current / episode.durationSeconds) * 100;
   const youtubeSrc = catalogYoutube;
   const streamUrl = youtubeSrc ? "" : playbackUrl || (loadingPlayback ? "" : episode.streamUrl || "");
   const hasStream = Boolean(youtubeSrc || streamUrl || loadingPlayback);
@@ -299,7 +275,7 @@ export function ReplayPlayer({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="relative rounded-2xl bg-black">
+      <div ref={stageRef} className="relative rounded-2xl bg-black">
         <div className="relative aspect-video overflow-hidden rounded-2xl">
           {youtubeId ? (
             <YoutubePlayer
@@ -310,6 +286,7 @@ export function ReplayPlayer({
             />
           ) : streamUrl ? (
             <HlsPlayer
+              ref={videoRef}
               src={streamUrl}
               poster={episode.image}
               autoPlay={continueAutoplay || autoPlayNext}
@@ -339,30 +316,15 @@ export function ReplayPlayer({
             </button>
           )}
         </div>
-        {youtubeSrc ? null : (
-          <div className="player-controls-glass absolute inset-x-0 bottom-0 z-10 flex flex-col justify-end text-white backdrop-blur-[18px]">
-            <div className="h-1 overflow-hidden rounded-full bg-white/25">
-              <div className="h-full rounded-full bg-white" style={{ width: `${progress}%` }} />
-            </div>
-            <div className="flex items-center gap-2 md:gap-3">
-              <button
-                type="button"
-                aria-label={playing ? "Pause" : "Play"}
-                onClick={() => setPlaying((value) => !value)}
-              >
-                {playing ? <IconPause className="h-5 w-5" /> : <IconPlay className="h-5 w-5" />}
-              </button>
-              <IconVolume className="hidden h-5 w-5 sm:block" />
-              <span className="hidden h-1 w-16 overflow-hidden rounded-full bg-white/20 sm:block">
-                <span className="block h-full w-2/3 bg-white" />
-              </span>
-              <span className="text-[11px] tabular-nums text-zinc-200">
-                {formatTime(current)} / {formatTime(episode.durationSeconds)}
-              </span>
-              <IconExpand className="ml-auto h-5 w-5" />
-            </div>
-          </div>
-        )}
+        {/* YouTube has its own controls; real controls only when there is a video to drive. */}
+        {!youtubeSrc && streamUrl ? (
+          <VideoControls
+            key={streamUrl}
+            videoRef={videoRef}
+            stageRef={stageRef}
+            fallbackDuration={episode.durationSeconds}
+          />
+        ) : null}
       </div>
 
       <div className="mt-5">

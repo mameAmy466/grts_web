@@ -215,8 +215,8 @@ body {
   display: none;
 }
 
-/* Radio volume slider: brand fill up to --level, theme-aware track */
-.radio-volume {
+/* Range sliders (volume, seek): brand fill up to --level, theme-aware track */
+.range-slider {
   appearance: none;
   -webkit-appearance: none;
   border-radius: 9999px;
@@ -227,7 +227,7 @@ body {
   );
 }
 
-.radio-volume::-webkit-slider-thumb {
+.range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   height: 12px;
   width: 12px;
@@ -236,7 +236,7 @@ body {
   border: 0;
 }
 
-.radio-volume::-moz-range-thumb {
+.range-slider::-moz-range-thumb {
   height: 12px;
   width: 12px;
   border-radius: 9999px;
@@ -244,7 +244,24 @@ body {
   border: 0;
 }
 
-.radio-volume:focus-visible {
+.range-slider:focus-visible {
   outline: 2px solid var(--color-brand);
   outline-offset: 4px;
+}
+
+/* On top of video: always white, whatever the theme */
+.range-slider.on-media {
+  background: linear-gradient(
+    to right,
+    var(--color-brand) var(--level, 100%),
+    rgba(255, 255, 255, 0.25) var(--level, 100%)
+  );
+}
+
+.range-slider.on-media::-webkit-slider-thumb {
+  background: #ffffff;
+}
+
+.range-slider.on-media::-moz-range-thumb {
+  background: #ffffff;
 }
