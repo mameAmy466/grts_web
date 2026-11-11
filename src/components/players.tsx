@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -14,7 +14,9 @@ import {
 import { HlsPlayer } from "@/components/hls-player";
 import { MediaImage } from "@/components/media-image";
 import { useRadioPlayer } from "@/components/radio-player-provider";
-import { unsplash } from "@/lib/utils";
+import { cn, unsplash } from "@/lib/utils";
+
+const CONTROLS_HIDE_DELAY = 8000;
 
 export function LiveVideoPlayer({
   src,
@@ -41,6 +43,9 @@ export function LiveVideoPlayer({
   const [muted, setMuted] = useState(!replay);
   const [started, setStarted] = useState(false);
   const [error, setError] = useState("");
+  const [controlsVisible, setControlsVisible] = useState(true);
+  const [hovering, setHovering] = useState(false);
+  const hideTimerRef = useRef<number | null>(null);
   const streamKey = youtubeSrc || src || "";
   const streamKeyRef = useRef(streamKey);
   const posterSrc = replay ? poster : undefined;
@@ -96,6 +101,26 @@ export function LiveVideoPlayer({
     if (radio?.playing) videoRef.current?.pause();
   }, [radio?.playing]);
 
+  // Controls: shown on hover / touch / keyboard focus, hidden after 8 s idle.
+  const clearHideTimer = useCallback(() => {
+    if (hideTimerRef.current != null) window.clearTimeout(hideTimerRef.current);
+    hideTimerRef.current = null;
+  }, []);
+
+  const showControls = useCallback(() => {
+    setControlsVisible(true);
+    clearHideTimer();
+    hideTimerRef.current = window.setTimeout(() => setControlsVisible(false), CONTROLS_HIDE_DELAY);
+  }, [clearHideTimer]);
+
+  useEffect(() => {
+    hideTimerRef.current = window.setTimeout(() => setControlsVisible(false), CONTROLS_HIDE_DELAY);
+    return clearHideTimer;
+  }, [clearHideTimer]);
+
+  // Keep the controls up while paused so play stays reachable.
+  const showBar = controlsVisible || hovering || !playing;
+
   async function togglePlay() {
     const video = videoRef.current;
     if (!video) return;
@@ -133,7 +158,21 @@ export function LiveVideoPlayer({
   }
 
   return (
-    <div ref={stageRef} className="relative rounded-2xl bg-black">
+    <div
+      ref={stageRef}
+      className="relative rounded-2xl bg-black"
+      onMouseEnter={() => {
+        setHovering(true);
+        setControlsVisible(true);
+        clearHideTimer();
+      }}
+      onMouseLeave={() => {
+        setHovering(false);
+        showControls();
+      }}
+      onTouchStart={showControls}
+      onFocus={showControls}
+    >
       <div className="relative aspect-video overflow-hidden rounded-2xl bg-black">
         {youtubeSrc ? (
           <iframe
@@ -210,15 +249,15 @@ export function LiveVideoPlayer({
             <span className="h-1.5 w-1.5 rounded-full bg-white" />
             Live
           </button>
-        ) : (
-          <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-brand px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
-            <span className="h-1.5 w-1.5 rounded-full bg-white" />
-            Live now
-          </span>
-        )}
+        ) : null}
       </div>
       {youtubeSrc ? null : (
-        <div className="player-controls-glass absolute inset-x-0 bottom-0 z-10 flex items-center text-white backdrop-blur-[18px]">
+        <div
+          className={cn(
+            "player-controls-glass absolute inset-x-0 bottom-0 z-10 flex items-center text-white backdrop-blur-[18px] transition-opacity duration-300",
+            showBar ? "opacity-100" : "pointer-events-none opacity-0",
+          )}
+        >
           <button
             type="button"
             aria-label={playing ? "Pause" : "Play"}

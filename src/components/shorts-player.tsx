@@ -155,14 +155,18 @@ export function ShortsPlayer({
               })}
             </div>
 
-            <button
-              type="button"
-              aria-label={muted ? "Activer le son" : "Couper le son"}
-              onClick={() => setMuted((value) => !value)}
-              className="btn-glass-dark absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full text-white"
-            >
-              {muted ? <IconVolumeOff className="h-5 w-5" /> : <IconVolume className="h-5 w-5" />}
-            </button>
+            {/* YouTube embeds draw their own volume + menu buttons top-right; only
+                direct video files need ours (it would otherwise cover YouTube's menu). */}
+            {isFileVideo(current.videoUrl) ? (
+              <button
+                type="button"
+                aria-label={muted ? "Activer le son" : "Couper le son"}
+                onClick={() => setMuted((value) => !value)}
+                className="btn-glass-dark absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full text-white"
+              >
+                {muted ? <IconVolumeOff className="h-5 w-5" /> : <IconVolume className="h-5 w-5" />}
+              </button>
+            ) : null}
           </div>
 
           <div className="absolute right-[-3.25rem] top-1/2 hidden -translate-y-1/2 flex-col gap-3 xl:flex">
