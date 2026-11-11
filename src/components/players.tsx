@@ -118,8 +118,9 @@ export function LiveVideoPlayer({
     return clearHideTimer;
   }, [clearHideTimer]);
 
-  // Keep the controls up while paused so play stays reachable.
-  const showBar = controlsVisible || hovering || !playing;
+  // Hidden 8 s after load or after the pointer leaves; hover, touch or
+  // keyboard focus brings it back (also when paused).
+  const showBar = controlsVisible || hovering;
 
   async function togglePlay() {
     const video = videoRef.current;
@@ -169,6 +170,13 @@ export function LiveVideoPlayer({
       onMouseLeave={() => {
         setHovering(false);
         showControls();
+      }}
+      onMouseMove={() => {
+        if (!hovering) {
+          setHovering(true);
+          setControlsVisible(true);
+          clearHideTimer();
+        }
       }}
       onTouchStart={showControls}
       onFocus={showControls}
