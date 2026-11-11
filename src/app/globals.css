@@ -214,3 +214,37 @@ body {
 .shorts-scroller::-webkit-scrollbar {
   display: none;
 }
+
+/* Radio volume slider: brand fill up to --level, theme-aware track */
+.radio-volume {
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    var(--color-brand) var(--level, 100%),
+    color-mix(in srgb, var(--fg) 15%, transparent) var(--level, 100%)
+  );
+}
+
+.radio-volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 12px;
+  width: 12px;
+  border-radius: 9999px;
+  background: var(--fg);
+  border: 0;
+}
+
+.radio-volume::-moz-range-thumb {
+  height: 12px;
+  width: 12px;
+  border-radius: 9999px;
+  background: var(--fg);
+  border: 0;
+}
+
+.radio-volume:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 4px;
+}
