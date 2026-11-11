@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { IconPlay, IconShare } from "@/components/icons";
 import { HlsPlayer } from "@/components/hls-player";
 import { MediaImage } from "@/components/media-image";
+import { useAutoHideControls } from "@/components/use-auto-hide-controls";
 import { VideoControls } from "@/components/video-controls";
 import { fetchVideoPlayback } from "@/lib/playback-client";
 import type { ReplayEpisode } from "@/lib/types";
@@ -197,6 +198,8 @@ export function ReplayPlayer({
   const [playing, setPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
+  // Hidden after 8 s; hover shows it (in fullscreen: pointer movement).
+  const { visible: controlsVisible, fullscreen, handlers: autoHideHandlers } = useAutoHideControls(stageRef);
   const [playbackUrl, setPlaybackUrl] = useState("");
   const [loadingPlayback, setLoadingPlayback] = useState(false);
   const [continueAutoplay, setContinueAutoplay] = useState(false);
@@ -275,7 +278,11 @@ export function ReplayPlayer({
 
   return (
     <div className="flex h-full flex-col">
-      <div ref={stageRef} className="relative rounded-2xl bg-black">
+      <div
+        ref={stageRef}
+        className={`relative rounded-2xl bg-black${fullscreen && !controlsVisible ? " cursor-none" : ""}`}
+        {...autoHideHandlers}
+      >
         <div className="relative aspect-video overflow-hidden rounded-2xl">
           {youtubeId ? (
             <YoutubePlayer
@@ -323,6 +330,9 @@ export function ReplayPlayer({
             videoRef={videoRef}
             stageRef={stageRef}
             fallbackDuration={episode.durationSeconds}
+            className={`transition-opacity duration-300 ${
+              controlsVisible ? "opacity-100" : "pointer-events-none opacity-0"
+            }`}
           />
         ) : null}
       </div>

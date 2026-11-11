@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -14,9 +14,9 @@ import {
 import { HlsPlayer } from "@/components/hls-player";
 import { MediaImage } from "@/components/media-image";
 import { useRadioPlayer } from "@/components/radio-player-provider";
+import { useAutoHideControls } from "@/components/use-auto-hide-controls";
 import { cn, unsplash } from "@/lib/utils";
 
-const CONTROLS_HIDE_DELAY = 8000;
 
 export function LiveVideoPlayer({
   src,
@@ -43,9 +43,6 @@ export function LiveVideoPlayer({
   const [muted, setMuted] = useState(!replay);
   const [started, setStarted] = useState(false);
   const [error, setError] = useState("");
-  const [controlsVisible, setControlsVisible] = useState(true);
-  const [hovering, setHovering] = useState(false);
-  const hideTimerRef = useRef<number | null>(null);
   const streamKey = youtubeSrc || src || "";
   const streamKeyRef = useRef(streamKey);
   const posterSrc = replay ? poster : undefined;
@@ -101,26 +98,8 @@ export function LiveVideoPlayer({
     if (radio?.playing) videoRef.current?.pause();
   }, [radio?.playing]);
 
-  // Controls: shown on hover / touch / keyboard focus, hidden after 8 s idle.
-  const clearHideTimer = useCallback(() => {
-    if (hideTimerRef.current != null) window.clearTimeout(hideTimerRef.current);
-    hideTimerRef.current = null;
-  }, []);
-
-  const showControls = useCallback(() => {
-    setControlsVisible(true);
-    clearHideTimer();
-    hideTimerRef.current = window.setTimeout(() => setControlsVisible(false), CONTROLS_HIDE_DELAY);
-  }, [clearHideTimer]);
-
-  useEffect(() => {
-    hideTimerRef.current = window.setTimeout(() => setControlsVisible(false), CONTROLS_HIDE_DELAY);
-    return clearHideTimer;
-  }, [clearHideTimer]);
-
-  // Hidden 8 s after load or after the pointer leaves; hover, touch or
-  // keyboard focus brings it back (also when paused).
-  const showBar = controlsVisible || hovering;
+  // Hidden after 8 s; hover shows it (in fullscreen: pointer movement).
+  const { visible: showBar, fullscreen, handlers: autoHideHandlers } = useAutoHideControls(stageRef);
 
   async function togglePlay() {
     const video = videoRef.current;
@@ -161,25 +140,8 @@ export function LiveVideoPlayer({
   return (
     <div
       ref={stageRef}
-      className="relative rounded-2xl bg-black"
-      onMouseEnter={() => {
-        setHovering(true);
-        setControlsVisible(true);
-        clearHideTimer();
-      }}
-      onMouseLeave={() => {
-        setHovering(false);
-        showControls();
-      }}
-      onMouseMove={() => {
-        if (!hovering) {
-          setHovering(true);
-          setControlsVisible(true);
-          clearHideTimer();
-        }
-      }}
-      onTouchStart={showControls}
-      onFocus={showControls}
+      className={cn("relative rounded-2xl bg-black", fullscreen && !showBar && "cursor-none")}
+      {...autoHideHandlers}
     >
       <div className="relative aspect-video overflow-hidden rounded-2xl bg-black">
         {youtubeSrc ? (
