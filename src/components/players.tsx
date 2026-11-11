@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -118,8 +118,9 @@ export function LiveVideoPlayer({
     return clearHideTimer;
   }, [clearHideTimer]);
 
-  // Keep the controls up while paused so play stays reachable.
-  const showBar = controlsVisible || hovering || !playing;
+  // Hidden 8 s after load or after the pointer leaves; hover, touch or
+  // keyboard focus brings it back (also when paused).
+  const showBar = controlsVisible || hovering;
 
   async function togglePlay() {
     const video = videoRef.current;
@@ -169,6 +170,13 @@ export function LiveVideoPlayer({
       onMouseLeave={() => {
         setHovering(false);
         showControls();
+      }}
+      onMouseMove={() => {
+        if (!hovering) {
+          setHovering(true);
+          setControlsVisible(true);
+          clearHideTimer();
+        }
       }}
       onTouchStart={showControls}
       onFocus={showControls}
@@ -489,12 +497,7 @@ export function FmPlayerBar({
         </div>
         <Waveform className="hidden flex-1 lg:block" accent />
         <div className="flex items-center gap-4">
-          <div className="hidden items-center gap-2 md:flex">
-            <IconVolume className="h-4 w-4 text-fg-muted" />
-            <span className="h-1 w-20 overflow-hidden rounded-full bg-fg/15">
-              <span className="block h-full w-3/4 bg-brand" />
-            </span>
-          </div>
+          <RadioVolume className="hidden md:flex" />
           <button
             type="button"
             aria-label={playing ? "Pause" : "Play"}
@@ -505,6 +508,39 @@ export function FmPlayerBar({
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function RadioVolume({ className }: { className?: string }) {
+  const radio = useRadioPlayer();
+  if (!radio) return null;
+  const silent = radio.muted || radio.volume === 0;
+  const level = silent ? 0 : Math.round(radio.volume * 100);
+
+  return (
+    <div className={cn("items-center gap-2", className)}>
+      <button
+        type="button"
+        aria-label={silent ? "Unmute radio" : "Mute radio"}
+        aria-pressed={silent}
+        onClick={radio.toggleMute}
+        className="flex h-8 w-8 items-center justify-center rounded-full text-fg-muted hover:text-fg"
+      >
+        {silent ? <IconVolumeOff className="h-4 w-4" /> : <IconVolume className="h-4 w-4" />}
+      </button>
+      <input
+        type="range"
+        min={0}
+        max={100}
+        step={1}
+        value={level}
+        onChange={(event) => radio.setVolume(Number(event.target.value) / 100)}
+        aria-label="Radio volume"
+        aria-valuetext={`${level}%`}
+        className="radio-volume h-1 w-24 cursor-pointer"
+        style={{ "--level": `${level}%` } as CSSProperties}
+      />
     </div>
   );
 }
